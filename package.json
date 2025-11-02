@@ -1,0 +1,25 @@
+{
+  "name": "how-to-zast",
+  "version": "1.0.0",
+  "description": "A program to help german ems workers with billing choices",
+  "homepage": "https://github.com/PatrickHollweck/how-to-zast#readme",
+  "bugs": {
+    "url": "https://github.com/PatrickHollweck/how-to-zast/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PatrickHollweck/how-to-zast.git"
+  },
+  "license": "MIT",
+  "author": "Patrick Hollweck <patrick-hollweck@gmx.de>",
+  "type": "module",
+  "scripts": {
+    "start": "tsx ./source/main.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

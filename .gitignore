@@ -2,4 +2,6 @@
 node_modules
 
 # Build artifacts
+dist
 build-output
+.parcel-cache

@@ -1,0 +1,13 @@
+@import "bootstrap/scss/bootstrap";
+
+.md2html {
+  p,
+  ol {
+    margin-bottom: 0.2rem !important;
+  }
+}
+
+.description-popover {
+  --bs-popover-max-width: 600px;
+  --bs-popover-border-color: red;
+}

@@ -1,9 +1,10 @@
+import { Prompts } from "./prompts.js";
 import type { PromptIOProvider } from "../io/io-provider.js";
+
 import {
   assertObjHasKey as assertObjectHasKey,
   type PickAssignableKeys,
 } from "../util/types.js";
-import { Prompts } from "./prompts.js";
 
 export class PromptContext {
   public io: PromptIOProvider;

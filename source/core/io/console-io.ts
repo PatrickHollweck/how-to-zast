@@ -1,10 +1,12 @@
 import { select } from "@inquirer/prompts";
+import { PromptIOProvider } from "./io-provider.js";
 
 import type * as t from "../prompts/types.js";
-import type { PromptIOProvider } from "./io-provider.js";
 
-export class ConsoleIO implements PromptIOProvider {
+export class ConsoleIO extends PromptIOProvider {
   constructor() {
+    super();
+
     process.on("uncaughtException", (error) => {
       if (!(error instanceof Error) || error.name !== "ExitPromptError") {
         throw error;
@@ -29,22 +31,6 @@ export class ConsoleIO implements PromptIOProvider {
       message: options.title,
       choices: options.choices,
     });
-  }
-
-  async selectBool(title: string, description?: string): Promise<boolean> {
-    let args = {
-      title,
-      choices: [
-        { name: "Ja", value: true },
-        { name: "Nein", value: false },
-      ],
-    } as any;
-
-    if (description != null) {
-      args.description = description;
-    }
-
-    return this.select(args);
   }
 
   async displayError(e: unknown): Promise<void> {

@@ -147,11 +147,13 @@ export class Prompts {
   public warNotarztBeteiligt() {
     return this.io.selectBool(
       "War ein Notarzt an der VERSORGUNG beteiligt?",
-      `Nur ja wenn:
-    1. Notarzt ärztliche Maßnahmen (wie: Basisuntersuchung, Anamneseerhebung, Diagniostik, Versorgung - einzeln oder in Kombination) durchgeführt und/oder angewiesen hat!
-    2. Leistungserbringung ausschließlich durch diensthabende oder von der ILS in Dienst gesetzte (Not-, Verlegungs-)Ärzte - also: Kein Haus-, Klinikarzt UND nicht bei zufälliger Anwesenheit!
-  Auch nein wenn:
-    - Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt`
+      `
+**Nur "ja" wenn:**
+1. Notarzt ärztliche Maßnahmen (wie: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung - einzeln oder in Kombination) durchgeführt und/oder angewiesen hat!
+2. Leistungserbringung ausschließlich durch diensthabende oder von der ILS in Dienst gesetzten Verlegungs- oder Notarzt!
+
+**Auch "nein" wenn:**
+1. Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt`
     );
   }
 
@@ -179,7 +181,7 @@ export class Prompts {
   }
 
   public istPrivateKrankenkasse() {
-    return this.io.selectBool("Ist der Patient Privatversichert?");
+    return this.io.selectBool("Ist der Patient privatversichert?");
   }
 
   public istUrsacheBerufskrankheit() {

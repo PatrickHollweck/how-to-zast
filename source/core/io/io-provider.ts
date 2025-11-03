@@ -1,21 +1,38 @@
 import type * as t from "../prompts/types.js";
 
-export interface PromptIOProvider {
-  message(...messages: any[]): Promise<void>;
+export abstract class PromptIOProvider {
+  public abstract message(...messages: any[]): Promise<void>;
 
-  select<T>(options: {
+  public abstract select<T>(options: {
     title: string;
     description?: string;
     choices: { name: string; value: T; description?: string }[];
   }): Promise<T>;
 
-  selectBool(title: string, description?: string): Promise<boolean>;
+  public abstract displayError(e: unknown): Promise<void>;
 
-  displayError(e: unknown): Promise<void>;
-
-  displayResult(
+  public abstract displayResult(
     transportType: t.TransportType,
     callType?: t.CallType | null,
     tariffType?: [t.BillingTariff, t.BillingType] | null
   ): Promise<void>;
+
+  public async selectBool(
+    title: string,
+    description?: string
+  ): Promise<boolean> {
+    let args = {
+      title,
+      choices: [
+        { name: "Ja", value: true },
+        { name: "Nein", value: false },
+      ],
+    } as any;
+
+    if (description != null) {
+      args.description = description;
+    }
+
+    return this.select(args);
+  }
 }

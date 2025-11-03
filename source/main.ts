@@ -68,7 +68,7 @@ async function handleTransportCall(ctx: PromptContext) {
       "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, muss als Notfalleinsatz abgerechnet werden!"
     );
 
-    ctx.overrideCache("alarmiert_als", t.AlarmReason.Notfall);
+    ctx.overrideCache("dispositionsSchlagwort", t.AlarmReason.Notfall);
   }
 
   const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
@@ -85,7 +85,7 @@ async function handleTransportCall(ctx: PromptContext) {
       "Abrechnung unmöglich! Ihr gewähltes Fahrzeug ist kein zugelassenes Transportmittel und kann somit keinen Transport abrechnen! Wählen sie ein anderes Einsatzmittel"
     );
 
-    ctx.flushCached("eingesetztes_fahrzeug");
+    ctx.flushCached("welchesEingesetzteFahrzeug");
 
     return handleTransportCall(ctx);
   }

@@ -1,3 +1,5 @@
+import type * as t from "../prompts/types.js";
+
 export interface PromptIOProvider {
   message(...messages: any[]): Promise<void>;
 
@@ -12,8 +14,8 @@ export interface PromptIOProvider {
   displayError(e: unknown): Promise<void>;
 
   displayResult(
-    transportType: number,
-    callType: number | null,
-    tariffType: number | null
+    transportType: t.TransportType,
+    callType?: t.CallType | null,
+    tariffType?: [t.BillingTariff, t.BillingType] | null
   ): Promise<void>;
 }

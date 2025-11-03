@@ -1,4 +1,6 @@
 import { select } from "@inquirer/prompts";
+
+import type * as t from "../prompts/types.js";
 import type { PromptIOProvider } from "./io-provider.js";
 
 export class ConsoleIO implements PromptIOProvider {
@@ -50,13 +52,20 @@ export class ConsoleIO implements PromptIOProvider {
   }
 
   async displayResult(
-    transportType: number,
-    callType: number | null,
-    tariffType: number | null
+    transportType: t.TransportType,
+    callType?: t.CallType | null,
+    tariff?: [t.BillingTariff, t.BillingType] | null
   ): Promise<void> {
     await this.message("Der Einsatz muss wie folgt abgerechnet werden:");
+
+    if (callType == null && tariff == null) {
+      await this.message("Transportart (TA:)", transportType);
+      return;
+    }
+
     await this.message("Transportart (TA:)", transportType);
     await this.message("Einsatzart (EA):", callType ?? "-");
-    await this.message("Tarif:", tariffType ?? "-");
+    await this.message(`Tarifziffer: ${tariff?.[0]}`);
+    await this.message(`Kostenträgertyp: ${tariff?.[1]}`);
   }
 }

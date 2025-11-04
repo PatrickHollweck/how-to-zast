@@ -31,7 +31,7 @@ export class Prompts {
 
   public szenario() {
     return this.io.select({
-      title: "Was beschreibt die Hauptaufgabe der Fahrt am besten...?",
+      title: "Was beschreibt die Hauptaufgabe der Fahrt am besten?",
       choices: [
         {
           name: "Fahrt zu Rettungseinsatz als Transportmittel",
@@ -44,6 +44,12 @@ export class Prompts {
           description:
             "Ein Notarzt oder Verlegungsarzt wurde durch die Leitstelle alarmiert und an die Einstalstelle verbracht.\nTypischerweise: NEF, VEF Einsätze\nAuch zu nutzen wenn NEF oder VEF defekt, besetzt oder anderweitig belegt ist und ein anderes Fahrzeug genutzt wird.",
           value: t.CallScenario.ArztZubringer,
+        },
+        {
+          name: "Transport eines Patient *von* oder *zu* Hubschrauberlandeplatz",
+          description:
+            "Transport von Hubschrauberlandeplatz in Einrichtung **oder** von Einrichtung zum Hubschrauberlandeplatz. Dort dann Übernahme durch RTH oder ITH",
+          value: t.CallScenario.HuLaPlaÜbernahme,
         },
         {
           name: "Fahrt zur Aufrechterhaltung des Dienstbetriebs",
@@ -106,7 +112,12 @@ export class Prompts {
   public wurdePatientTransportiert() {
     return this.io.selectBool(
       "Wurde ein Patient mit ihrem Fahrzeug transportiert?",
-      "Auch ja bei: Transport von Einsatzstelle zu luftgebundenem Rettungsmittel (RTH, ITH)"
+      `
+- **Auch "Ja" bei:**
+  1. Transport von Einsatzstelle **zu** luftgebundenem Rettungsmittel (RTH, ITH).
+  2. Einsatz als NAW (RTW + NA, ohne seperates Einsatzmittel, zugestiegen).
+- **Auch "Nein" wenn:** Reanimation während Transport eingestellt wurde.
+- Genauer Zielort nicht relevant! Was zählt ist das "erreichen" des definierten Zielorts.`
     );
   }
 
@@ -146,7 +157,7 @@ export class Prompts {
 
   public warNotarztBeteiligt() {
     return this.io.selectBool(
-      "War ein Notarzt an der VERSORGUNG beteiligt?",
+      "War ein Notarzt an der *VERSORGUNG* ihres Patienten beteiligt?",
       `
 **Nur "ja" wenn:**
 1. Notarzt ärztliche Maßnahmen (wie: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung - einzeln oder in Kombination) durchgeführt und/oder angewiesen hat!
@@ -190,6 +201,12 @@ export class Prompts {
     );
   }
 
+  public istBerufsgenossenschaftBekannt() {
+    return this.io.selectBool(
+      "Ist die zuständige Berufsgenossenschaft bekannt?"
+    );
+  }
+
   public notfallSzenarioOhneNA() {
     // TODO
     return this.io.select({
@@ -208,7 +225,7 @@ export class Prompts {
       choices: [
         {
           name: "Arbeitsunfall / Wegeunfall",
-          value: t.EmergencyScenario.ArbeitsWegeUnfall,
+          value: t.EmergencyScenario.ArbeitsOderWegeUnfall,
           description:
             "Notarzteinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
         },

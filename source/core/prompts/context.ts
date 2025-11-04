@@ -39,7 +39,7 @@ export class PromptContext {
     });
   }
 
-  public overrideCache<
+  public setCached<
     K extends PickAssignableKeys<Prompts, () => Promise<any>>,
     V extends Awaited<ReturnType<this["prompts"][K]>>
   >(key: K, value: V) {
@@ -48,5 +48,18 @@ export class PromptContext {
 
   public flushCached(key: keyof this["prompts"]) {
     this.cache.delete(key.toString());
+  }
+
+  public hasCached<K extends PickAssignableKeys<Prompts, () => Promise<any>>>(
+    key: K
+  ): boolean {
+    return this.cache.has(key);
+  }
+
+  public getCached<
+    K extends PickAssignableKeys<Prompts, () => Promise<any>>,
+    V extends Awaited<ReturnType<this["prompts"][K]>>
+  >(key: K): V | null {
+    return this.cache.get(key);
   }
 }

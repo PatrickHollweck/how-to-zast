@@ -7,6 +7,7 @@ import * as t from "../prompts/types.js";
 
 export class HtmlIO extends PromptIOProvider {
   private renderArea: HTMLElement;
+  private isFirstScroll: boolean = true;
 
   constructor() {
     super();
@@ -19,10 +20,17 @@ export class HtmlIO extends PromptIOProvider {
   }
 
   private async md2html(text: string) {
-    return await marked.parse(text.trim(), { gfm: true });
+    return `<div class="md2html">${await marked.parse(text.trim(), {
+      gfm: true,
+    })}</div>`;
   }
 
   private scrollToTargetAdjusted(element: HTMLElement, offset: number = 100) {
+    if (this.isFirstScroll) {
+      this.isFirstScroll = false;
+      return;
+    }
+
     var elementPosition = element.getBoundingClientRect().top;
     var offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -62,7 +70,7 @@ export class HtmlIO extends PromptIOProvider {
       "align-items-center"
     );
 
-    titleDisplay$.textContent = title;
+    titleDisplay$.innerHTML = await this.md2html(title);
 
     for (const extraElement of options?.extraHeaderElements ?? []) {
       titleDisplay$.appendChild(extraElement);
@@ -101,12 +109,12 @@ export class HtmlIO extends PromptIOProvider {
 
   async message(type: t.MessageType, ...messages: any[]): Promise<void> {
     const container$ = document.createElement("div");
+    container$.setAttribute("role", "alert");
 
     container$.classList.add(
       "alert",
       "d-flex",
       "align-items-center",
-      "md2html",
       "row",
       "mt-4",
       "mb-2",
@@ -145,14 +153,31 @@ export class HtmlIO extends PromptIOProvider {
     }
 
     container$.innerHTML = `
-      <div class="d-flex">
+      <div class="d-flex mb-2">
         <span class="bi flex-shrink-0 me-3 ${icon}"></span>
         ${await this.md2html(messages.join(" "))}
       </div>`;
 
-    container$.setAttribute("role", "alert");
+    const divider$ = document.createElement("hr");
+    container$.appendChild(divider$);
+
+    const confirmButton$ = document.createElement("button");
+    confirmButton$.classList.add("btn", "btn-primary");
+    confirmButton$.textContent = "Bestätigen";
+
+    container$.appendChild(confirmButton$);
 
     this.append(container$);
+
+    this.scrollToTargetAdjusted(container$);
+
+    return new Promise((resolve) => {
+      confirmButton$.addEventListener("click", () => {
+        divider$.remove();
+        confirmButton$.remove();
+        resolve();
+      });
+    });
   }
 
   select<T>(options: {
@@ -167,7 +192,7 @@ export class HtmlIO extends PromptIOProvider {
 
       for (const option of options.choices) {
         const button$ = document.createElement("button");
-        button$.textContent = option.name;
+        button$.innerHTML = await this.md2html(option.name);
 
         button$.classList.add(
           "btn",
@@ -206,12 +231,7 @@ export class HtmlIO extends PromptIOProvider {
           );
 
           const description$ = document.createElement("span");
-
-          description$.innerHTML = `
-            <div class="d-flex">
-              <span class="bi flex-shrink-0 me-2 bi-info-circle-fill"></span>
-              ${await this.md2html(option.description)}
-            </div>`;
+          description$.innerHTML = await this.md2html(option.description);
 
           description$.classList.add(
             "option-description",

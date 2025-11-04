@@ -28,12 +28,13 @@ export const enum CallScenario {
   Werkstattfahrt,
   Gebietsabsicherung,
   ArztZubringer,
+  HuLaPlaÜbernahme,
 }
 
 export const enum EmergencyScenario {
   Verkehrsunfall,
   Verlegung,
-  ArbeitsWegeUnfall,
+  ArbeitsOderWegeUnfall,
   Schulunfall,
   Internistisch,
   SonstigerUnfall,

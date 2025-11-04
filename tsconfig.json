@@ -12,7 +12,7 @@
     "noImplicitReturns": true,
     "noImplicitOverride": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "noPropertyAccessFromIndexSignature": true,
 
     "strict": true,

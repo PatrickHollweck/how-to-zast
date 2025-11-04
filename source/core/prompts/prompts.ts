@@ -201,17 +201,11 @@ export class Prompts {
   public notfallSzenarioMitNA() {
     return this.io.select({
       title: "Was beschreibt das Einsatzszenario am besten?",
+      description: `
+- Arbeits-, Wege-, und Schulunfälle dürfen **nicht** als als Verkehrsunfall oder "Sonstiger Unfall" abgerechnet werden, wenn ein direkter Zusammenhang zwischen der schulischen oder beruflichen Tätigkeit besteht! Weil diese Einsätze nicht über die Berufsgenossenschaft abgerechnet werden können
+- Internistische Notfälle können **nicht**, als "Unfall" abgerechnet werden. Beispiel: Ein Herzinfarkt am Arbeitsplatz ist keine BG-Sache!
+      `,
       choices: [
-        {
-          name: "Verkehrsunfall",
-          value: t.EmergencyScenario.Verkehrsunfall,
-          description: "Unfall mit Verkehrsfahrzeug jeder Art",
-        },
-        {
-          name: "Verlegung",
-          value: t.EmergencyScenario.Verlegung,
-          description: "Verlegung von KHS A nach KHS B",
-        },
         {
           name: "Arbeitsunfall / Wegeunfall",
           value: t.EmergencyScenario.ArbeitsWegeUnfall,
@@ -223,6 +217,16 @@ export class Prompts {
           value: t.EmergencyScenario.Schulunfall,
           description:
             "Notarzteinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
+        },
+        {
+          name: "Verkehrsunfall",
+          value: t.EmergencyScenario.Verkehrsunfall,
+          description: "Unfall mit Verkehrsfahrzeug jeder Art",
+        },
+        {
+          name: "Verlegung",
+          value: t.EmergencyScenario.Verlegung,
+          description: "Verlegung von KHS A nach KHS B",
         },
         {
           name: "Internistischer Notfall",

@@ -38,7 +38,7 @@ export class HtmlIO extends PromptIOProvider {
     options?: {
       description?: string | null;
       cardClasses?: string[];
-      extraHeaderElements?: HTMLElement[];
+      extraHeaderElements?: HTMLElement[] | null;
     }
   ) {
     const container$ = document.createElement("div");
@@ -257,7 +257,11 @@ export class HtmlIO extends PromptIOProvider {
       card$ = await this.createCard(options.title, elements, {
         description: options.description ?? null,
         cardClasses: ["border-primary"],
-        extraHeaderElements: [explainButton$],
+        extraHeaderElements: options.choices.some(
+          (option) => option.description != null
+        )
+          ? [explainButton$]
+          : null,
       });
     });
   }

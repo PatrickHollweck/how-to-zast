@@ -199,6 +199,7 @@ export class HtmlIO extends PromptIOProvider {
           "btn-primary",
           "col",
           "py-2",
+          "px-4",
           "fs-5",
           "rounded-top",
           options.choices.length > 2 ? "text-start" : "text-center"

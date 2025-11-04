@@ -34,7 +34,7 @@ export class Prompts {
       title: "Was beschreibt die Hauptaufgabe der Fahrt am besten?",
       choices: [
         {
-          name: "Fahrt zu Rettungseinsatz als Transportmittel",
+          name: "Fahrt zu Einsatz als Transportmittel",
           description:
             "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW\nausschließlich bei Beauftragung durch zuständige ILS",
           value: t.CallScenario.Rettungsfahrt,

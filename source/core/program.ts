@@ -1,5 +1,6 @@
 import * as t from "./prompts/types.js";
 
+import { findBillingType } from "./billing.js";
 import type { PromptContext } from "./prompts/context.js";
 
 export async function startPrompt(ctx: PromptContext) {
@@ -110,121 +111,6 @@ async function handleCallToTransport(ctx: PromptContext) {
     throw new Error("Not implemented yet");
   }
 }
-
-async function isPrivatOrUnknownInsurance(ctx: PromptContext) {
-  return (
-    (await ctx.prompts.istPrivateKrankenkasse()) ||
-    !(await ctx.prompts.istKrankenkasseBekannt())
-  );
-}
-
-async function findBillingType(
-  ctx: PromptContext,
-  billingContextType: t.BillingContextTyp
-): Promise<[number, t.BillingType] | null> {
-  switch (billingContextType) {
-    case t.BillingContextTyp.KTP:
-      if ((await ctx.prompts.szenario()) === t.CallScenario.HuLaPlaÜbernahme) {
-        if (await ctx.prompts.istUrsacheBerufskrankheit()) {
-          if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
-            return [t.BillingTariff.KTP_BG_KTR, t.BillingType.BG];
-          }
-
-          return [t.BillingTariff.KTP_SZ, t.BillingType.SZ];
-        }
-
-        if (
-          await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()
-        ) {
-          return [t.BillingTariff.KTP_KHS, t.BillingType.KHS];
-        }
-
-        if (await isPrivatOrUnknownInsurance(ctx)) {
-          return [t.BillingTariff.KTP_SZ, t.BillingType.SZ];
-        }
-
-        return [t.BillingTariff.KTP_BG_KTR, t.BillingType.KTR];
-      }
-
-      return null;
-    case t.BillingContextTyp.NF:
-      return null;
-    case t.BillingContextTyp.NA:
-      if (!(await ctx.prompts.wurdePatientTransportiert())) {
-        switch (await ctx.prompts.notfallSzenarioMitNA()) {
-          case t.EmergencyScenario.Schulunfall:
-          case t.EmergencyScenario.ArbeitsOderWegeUnfall:
-            if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
-              return [t.BillingTariff.NA_KTR_BG, t.BillingType.BG];
-            }
-
-            await ctx.io.message(
-              t.MessageType.Info,
-              "Ist die zuständige Berufsgenossenschaft nicht bekannt muss eine Privatrechnung ausgestellt werden. Der Arbeitnehmer (bzw. Schüler) kann diese dann einreichen, sobald der Träger geklärt wurde."
-            );
-
-            return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-          case t.EmergencyScenario.Verlegung:
-          case t.EmergencyScenario.SonstigerNofall:
-            if (!(await ctx.prompts.istUrsacheBerufskrankheit())) {
-              break;
-            }
-
-            if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
-              return [t.BillingTariff.NA_KTR_BG, t.BillingType.BG];
-            }
-
-            return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-        }
-
-        if (await isPrivatOrUnknownInsurance(ctx)) {
-          return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-        }
-
-        return [t.BillingTariff.NA_KTR_BG, t.BillingType.KTR];
-      }
-
-      switch (await ctx.prompts.notfallSzenarioMitNA()) {
-        case t.EmergencyScenario.ArbeitsOderWegeUnfall:
-        case t.EmergencyScenario.Schulunfall:
-          await ctx.io.message(
-            t.MessageType.Info,
-            "Name und Anschrift des Arbeitgeber (bzw. Schule) in ZAST-Info Feld oder auf Transportschein notieren!"
-          );
-
-          if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
-            return [t.BillingTariff.NA_KTR_BG, t.BillingType.BG];
-          }
-
-          return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-        case t.EmergencyScenario.Internistisch:
-        case t.EmergencyScenario.Verkehrsunfall:
-        case t.EmergencyScenario.SonstigerUnfall:
-          return (await isPrivatOrUnknownInsurance(ctx))
-            ? [t.BillingTariff.NA_SZ, t.BillingType.SZ]
-            : [t.BillingTariff.NA_KTR_BG, t.BillingType.KTR];
-        case t.EmergencyScenario.Verlegung:
-          if (
-            await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()
-          ) {
-            return [t.BillingTariff.NA_KHS, t.BillingType.KHS];
-          }
-
-          if (await isPrivatOrUnknownInsurance(ctx)) {
-            return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-          }
-
-          return [t.BillingTariff.NA_KTR_BG, t.BillingType.KTR];
-        case t.EmergencyScenario.SonstigerNofall:
-          if (await isPrivatOrUnknownInsurance(ctx)) {
-            return [t.BillingTariff.NA_SZ, t.BillingType.SZ];
-          }
-
-          return [t.BillingTariff.NA_KTR_BG, t.BillingType.KTR];
-      }
-  }
-}
-
 async function handleNonTransport(ctx: PromptContext) {
   if (!(await ctx.prompts.wurdePatientAngetroffen())) {
     return await ctx.io.displayResult(t.TransportType.Leerfahrt);
@@ -251,43 +137,43 @@ async function handleNonTransport(ctx: PromptContext) {
 **Zu beachten:**
 1. Als Transportweg ist von \"Notarztversorgung\" nach \"Patienten- oder Behandlungsadresse\" anzugeben
 2. Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn im Regelfall eine erneute Notarztalarmierung über die ILS erfolgt wäre
-3. Bei einem MANV ist Abrechnungen im Einzelfall mit ZAST GmbH klären!`
+3. Bei einem MANV ist die Abrechnungen mit der ZAST GmbH direkt zu klären!`
   );
 
   switch (await ctx.prompts.notfallSzenarioMitNA()) {
-    case t.EmergencyScenario.Verkehrsunfall:
-    case t.EmergencyScenario.ArbeitsOderWegeUnfall:
-    case t.EmergencyScenario.Schulunfall:
-    case t.EmergencyScenario.SonstigerUnfall:
+    case t.EmergencyScenario_NA.Verkehrsunfall:
+    case t.EmergencyScenario_NA.ArbeitsOderWegeUnfall:
+    case t.EmergencyScenario_NA.Schulunfall:
+    case t.EmergencyScenario_NA.SonstigerUnfall:
       return await ctx.io.displayResult(
         t.TransportType.Verrechenbar,
         t.CallType.NA_kein_Transport_Unfall,
         await findBillingType(ctx, t.BillingContextTyp.NA)
       );
-    case t.EmergencyScenario.Internistisch:
-    case t.EmergencyScenario.SonstigerNofall:
+    case t.EmergencyScenario_NA.Internistisch:
+    case t.EmergencyScenario_NA.SonstigerNofall:
       return await ctx.io.displayResult(
         t.TransportType.Verrechenbar,
         t.CallType.NA_kein_Transport_Internistisch,
         await findBillingType(ctx, t.BillingContextTyp.NA)
       );
-    case t.EmergencyScenario.Verlegung:
+    case t.EmergencyScenario_NA.Verlegung:
       await ctx.io.message(
         t.MessageType.Error,
-        "**Fehler:** Eine Verlegung ohne Transport ist nicht möglich... Dieses Einsatzszenario ist so nicht möglich."
+        "**Fehler:** Eine Verlegung ohne Transport gibt es nicht... Dieses Einsatzszenario ist so nicht möglich."
       );
   }
 }
 
 async function handleTransportWithDoctorInvolvement(ctx: PromptContext) {
   let callType = {
-    [t.EmergencyScenario.Verkehrsunfall]: t.CallType.NA_VU,
-    [t.EmergencyScenario.Verlegung]: t.CallType.NA_Verlegung,
-    [t.EmergencyScenario.ArbeitsOderWegeUnfall]: t.CallType.NA_Arbeitsunfall,
-    [t.EmergencyScenario.Schulunfall]: t.CallType.NA_Schulunfall,
-    [t.EmergencyScenario.Internistisch]: t.CallType.NA_Internistisch,
-    [t.EmergencyScenario.SonstigerUnfall]: t.CallType.NA_Sonstiger_Unfall,
-    [t.EmergencyScenario.SonstigerNofall]: t.CallType.NA_Sonstiger_Notfall,
+    [t.EmergencyScenario_NA.Verkehrsunfall]: t.CallType.NA_VU,
+    [t.EmergencyScenario_NA.Verlegung]: t.CallType.NA_Verlegung,
+    [t.EmergencyScenario_NA.ArbeitsOderWegeUnfall]: t.CallType.NA_Arbeitsunfall,
+    [t.EmergencyScenario_NA.Schulunfall]: t.CallType.NA_Schulunfall,
+    [t.EmergencyScenario_NA.Internistisch]: t.CallType.NA_Internistisch,
+    [t.EmergencyScenario_NA.SonstigerUnfall]: t.CallType.NA_Sonstiger_Unfall,
+    [t.EmergencyScenario_NA.SonstigerNofall]: t.CallType.NA_Sonstiger_Notfall,
   }[await ctx.prompts.notfallSzenarioMitNA()];
 
   return await ctx.io.displayResult(

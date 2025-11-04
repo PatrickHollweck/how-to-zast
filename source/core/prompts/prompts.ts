@@ -164,7 +164,7 @@ export class Prompts {
 2. Leistungserbringung ausschließlich durch diensthabende oder von der ILS in Dienst gesetzten Verlegungs- oder Notarzt!
 
 **Auch "nein" wenn:**
-1. Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt`
+1. Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt = Notarzt hat Patient nie gesehen"`
     );
   }
 
@@ -191,13 +191,15 @@ export class Prompts {
     );
   }
 
-  public istPrivateKrankenkasse() {
-    return this.io.selectBool("Ist der Patient privatversichert?");
+  public istPrivateOderUnbekannteKrankenkasse() {
+    return this.io.selectBool(
+      "Ist der Patient privat versichert **oder** die Krankenversicherung unbekannt?"
+    );
   }
 
-  public istUrsacheBerufskrankheit() {
+  public istUrsacheBG() {
     return this.io.selectBool(
-      "Ist ein Schul-, Arbeits- und Wegeunfall oder Berufskrankheit ursächlich für den Transport?"
+      "Ist ein Schul-, Arbeits-, Wegeunfall oder eine anerkannte Berufskrankheit ursächlich für den Transport?"
     );
   }
 
@@ -205,14 +207,6 @@ export class Prompts {
     return this.io.selectBool(
       "Ist die zuständige Berufsgenossenschaft bekannt?"
     );
-  }
-
-  public notfallSzenarioOhneNA() {
-    // TODO
-    return this.io.select({
-      title: "Was beschreibt das Einsatzszenario am besten?",
-      choices: [],
-    });
   }
 
   public notfallSzenarioMitNA() {
@@ -225,41 +219,41 @@ export class Prompts {
       choices: [
         {
           name: "Arbeitsunfall / Wegeunfall",
-          value: t.EmergencyScenario.ArbeitsOderWegeUnfall,
+          value: t.EmergencyScenario_NA.ArbeitsOderWegeUnfall,
           description:
             "Notarzteinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
         },
         {
           name: "Schulunfall",
-          value: t.EmergencyScenario.Schulunfall,
+          value: t.EmergencyScenario_NA.Schulunfall,
           description:
             "Notarzteinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
         },
         {
           name: "Verkehrsunfall",
-          value: t.EmergencyScenario.Verkehrsunfall,
+          value: t.EmergencyScenario_NA.Verkehrsunfall,
           description: "Unfall mit Verkehrsfahrzeug jeder Art",
         },
         {
           name: "Verlegung",
-          value: t.EmergencyScenario.Verlegung,
+          value: t.EmergencyScenario_NA.Verlegung,
           description: "Verlegung von KHS A nach KHS B",
         },
         {
           name: "Internistischer Notfall",
-          value: t.EmergencyScenario.Internistisch,
+          value: t.EmergencyScenario_NA.Internistisch,
           description:
             "Jeder Internistische Nofall. Auch: Reanimation mit internistischer Ursache",
         },
         {
           name: "Sonstiger Unfall",
-          value: t.EmergencyScenario.SonstigerUnfall,
+          value: t.EmergencyScenario_NA.SonstigerUnfall,
           description:
             "Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
         },
         {
           name: "Sonstiger Notfall",
-          value: t.EmergencyScenario.SonstigerNofall,
+          value: t.EmergencyScenario_NA.SonstigerNofall,
           description:
             "Notarzteinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
         },

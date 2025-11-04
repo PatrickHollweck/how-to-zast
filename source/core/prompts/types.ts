@@ -31,7 +31,7 @@ export const enum CallScenario {
   HuLaPlaÜbernahme,
 }
 
-export const enum EmergencyScenario {
+export const enum EmergencyScenario_NA {
   Verkehrsunfall,
   Verlegung,
   ArbeitsOderWegeUnfall,
@@ -53,19 +53,19 @@ export const enum BillingContextTyp {
 }
 
 export const enum BillingType {
-  KTR = "KTR - Kostenträger, Krankenkasse",
-  SZ = "SZ - Selbstzahler",
-  BG = "BG - Berufsgenossenschaft",
-  KHS = "KHS - (abgebendes) Krankenhaus",
+  KTR = "KTR # Krankenkasse des Patienten",
+  SZ = "SZ # Selbstzahler bzw. Privatrechnung",
+  BG = "BG # zuständige Berufsgenossenschaft",
+  KHS = "KHS # abgebendes Krankenhaus",
 }
 
 export const enum BillingTariff {
   // Krankentransport
-  KTP_BG_KTR = 10,
+  KTP_KTR_BG = 10,
   KTP_SZ = 20,
   KTP_KHS = 80,
   // Notfälle
-  NF_BG_KTR = 11,
+  NF_KTR_BG = 11,
   NF_SZ = 21,
   NF_KHS = 91,
   NF_NEUGEBORENEN_AUGSBURG = 71,

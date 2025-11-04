@@ -5,6 +5,7 @@ import type { PromptContext } from "./prompts/context.js";
 export async function startPrompt(ctx: PromptContext) {
   if ((await ctx.prompts.vorhaltung()) === t.ProvisionType.Sondereinsatz) {
     await ctx.io.message(
+      t.MessageType.Alert,
       "In diesem Tool sind Sondereinsätze aktuell nicht verpflegt."
     );
 
@@ -23,6 +24,7 @@ export async function startPrompt(ctx: PromptContext) {
       break;
     case t.CallScenario.Werkstattfahrt:
       await ctx.io.message(
+        t.MessageType.Warning,
         "Dauert die Reparatur länger als einen Tag, muss für die Rückfahrt eine zweite Fahrt mit Nummer gebucht werden, ansonsten reicht eine"
       );
 
@@ -61,6 +63,7 @@ async function handleTransportCall(ctx: PromptContext) {
 
   if (alarmType === t.AlarmReason.Notarzt) {
     await ctx.io.message(
+      t.MessageType.Warning,
       "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, muss als Notfalleinsatz abgerechnet werden!"
     );
 
@@ -77,7 +80,8 @@ async function handleTransportCall(ctx: PromptContext) {
       t.VehicleKind.Misc,
     ].includes(currentVehicle)
   ) {
-    ctx.io.message(
+    await ctx.io.message(
+      t.MessageType.Error,
       "Abrechnung unmöglich! Ihr gewähltes Fahrzeug ist kein zugelassenes Transportmittel und kann somit keinen Transport abrechnen! Wählen sie ein anderes Einsatzmittel"
     );
 
@@ -140,6 +144,7 @@ async function findBillingType(
         case t.EmergencyScenario.ArbeitsWegeUnfall:
         case t.EmergencyScenario.Schulunfall:
           await ctx.io.message(
+            t.MessageType.Info,
             "Name des Arbeitgeber/Schule und Anschrift notieren!"
           );
 
@@ -180,14 +185,22 @@ async function handleNonTransport(ctx: PromptContext) {
   const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
 
   if (await ctx.prompts.beiEintreffenSichereTodeszeichen()) {
+    await ctx.io.message(
+      t.MessageType.Info,
+      "Liegen beim Eintreffen des Rettungsdienstes sichere Todeszeichen vor, ist keine Verrechnung möglich!"
+    );
+
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
   }
 
   if (doctorInvolvement) {
-    await ctx.io.message(`Zu beachten:
+    await ctx.io.message(
+      t.MessageType.Info,
+      `Zu beachten:
         1. Bei einem Massenanfall von Verletzten (MANV) können diese Vorgaben nicht angewandt werden. Abrechnungen sind im Einzelfall in Absprache mit der ZAST GmbH zu klären.
         2. Als Transportweg ist von \"Notarztversorgung\" nach \"Patienten- oder Behandlungsadresse\" anzugeben
-        3. Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn im Regelfall hier eine erneute Notarztalarmierung über die ILS erfolgt wäre`);
+        3. Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn im Regelfall hier eine erneute Notarztalarmierung über die ILS erfolgt wäre`
+    );
 
     switch (await ctx.prompts.notfallSzenarioMitNA()) {
       case t.EmergencyScenario.Verkehrsunfall:
@@ -208,6 +221,7 @@ async function handleNonTransport(ctx: PromptContext) {
         );
       case t.EmergencyScenario.Verlegung:
         return await ctx.io.message(
+          t.MessageType.Error,
           "Eine durchgeführte Verlegung ohne Transport ist nicht möglich."
         );
     }
@@ -260,7 +274,7 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
         case t.AlarmReason.Krankentransport:
         // @ts-expect-error # Explicit fallthrough
         case t.AlarmReason.Notfall:
-          await ctx.io.message(callUpgradeMessage);
+          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
         case t.AlarmReason.Notarzt:
         case t.AlarmReason.Verlegungsarzt:
           return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);
@@ -270,11 +284,12 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
         case t.AlarmReason.Krankentransport:
         // @ts-expect-error # Explicit fallthrough
         case t.AlarmReason.Notfall:
-          await ctx.io.message(callUpgradeMessage);
+          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
         case t.AlarmReason.Notarzt:
           return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
         case t.AlarmReason.Verlegungsarzt:
           await ctx.io.message(
+            t.MessageType.Alert,
             "Eine Alarmierung eines NEF zu einer VEF-Verlegung ist nicht möglich. Im Zweifel als Notarztverlegung abrechnen!"
           );
 
@@ -285,8 +300,8 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
         case t.AlarmReason.Krankentransport:
         case t.AlarmReason.Notfall:
         case t.AlarmReason.Notarzt:
-          await ctx.io.message(callUpgradeMessage);
-          // TODO: So richtig?
+          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
+
           return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
         case t.AlarmReason.Verlegungsarzt:
           return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);

@@ -1,7 +1,7 @@
 import { select } from "@inquirer/prompts";
 import { PromptIOProvider } from "./io-provider.js";
 
-import type * as t from "../prompts/types.js";
+import * as t from "../prompts/types.js";
 
 export class ConsoleIO extends PromptIOProvider {
   constructor() {
@@ -14,8 +14,8 @@ export class ConsoleIO extends PromptIOProvider {
     });
   }
 
-  async message(...messages: any[]): Promise<void> {
-    console.log(...messages);
+  async message(type: t.MessageType, ...messages: any[]): Promise<void> {
+    console.log(type, ...messages);
   }
 
   async select<T>(options: {
@@ -24,7 +24,7 @@ export class ConsoleIO extends PromptIOProvider {
     choices: { name: string; value: T; description?: string }[];
   }): Promise<T> {
     if (options.description != null) {
-      await this.message(options.description);
+      await this.message(t.MessageType.Info, options.description);
     }
 
     return await select({
@@ -42,16 +42,23 @@ export class ConsoleIO extends PromptIOProvider {
     callType?: t.CallType | null,
     tariff?: [t.BillingTariff, t.BillingType] | null
   ): Promise<void> {
-    await this.message("Der Einsatz muss wie folgt abgerechnet werden:");
+    await this.message(
+      t.MessageType.Info,
+      "Der Einsatz muss wie folgt abgerechnet werden:"
+    );
 
     if (callType == null && tariff == null) {
-      await this.message("Transportart (TA:)", transportType);
+      await this.message(
+        t.MessageType.Info,
+        "Transportart (TA:)",
+        transportType
+      );
       return;
     }
 
-    await this.message("Transportart (TA:)", transportType);
-    await this.message("Einsatzart (EA):", callType ?? "-");
-    await this.message(`Tarifziffer: ${tariff?.[0]}`);
-    await this.message(`Kostenträgertyp: ${tariff?.[1]}`);
+    await this.message(t.MessageType.Info, "Transportart (TA:)", transportType);
+    await this.message(t.MessageType.Info, "Einsatzart (EA):", callType ?? "-");
+    await this.message(t.MessageType.Info, `Tarifziffer: ${tariff?.[0]}`);
+    await this.message(t.MessageType.Info, `Kostenträgertyp: ${tariff?.[1]}`);
   }
 }

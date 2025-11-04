@@ -1,5 +1,8 @@
 @import "bootstrap/scss/bootstrap";
 
+$bootstrap-icons-font-dir: "../../../node_modules/bootstrap-icons/font/fonts";
+@import "bootstrap-icons/font/bootstrap-icons";
+
 .md2html {
   p,
   ol {
@@ -8,6 +11,4 @@
 }
 
 .description-popover {
-  --bs-popover-max-width: 600px;
-  --bs-popover-border-color: red;
 }

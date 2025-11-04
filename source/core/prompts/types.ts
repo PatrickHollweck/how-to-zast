@@ -1,3 +1,11 @@
+export enum MessageType {
+  Info,
+  Success,
+  Warning,
+  Alert,
+  Error,
+}
+
 export const enum AlarmReason {
   Krankentransport,
   Notfall,

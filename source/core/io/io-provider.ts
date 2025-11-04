@@ -1,7 +1,10 @@
 import type * as t from "../prompts/types.js";
 
 export abstract class PromptIOProvider {
-  public abstract message(...messages: any[]): Promise<void>;
+  public abstract message(
+    type: t.MessageType,
+    ...messages: any[]
+  ): Promise<void>;
 
   public abstract select<T>(options: {
     title: string;

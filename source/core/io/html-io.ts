@@ -1,11 +1,9 @@
 import "bootstrap";
 
 import { marked } from "marked";
-import { Popover } from "bootstrap";
-
 import { PromptIOProvider } from "./io-provider.js";
 
-import type * as t from "../prompts/types.js";
+import * as t from "../prompts/types.js";
 
 export class HtmlIO extends PromptIOProvider {
   private renderArea: HTMLElement;
@@ -37,7 +35,11 @@ export class HtmlIO extends PromptIOProvider {
   private async createCard(
     title: string,
     content: HTMLElement[],
-    options?: { description?: string | null; cardClasses?: string[] }
+    options?: {
+      description?: string | null;
+      cardClasses?: string[];
+      extraHeaderElements?: HTMLElement[];
+    }
   ) {
     const container$ = document.createElement("div");
     container$.classList.add(
@@ -51,14 +53,28 @@ export class HtmlIO extends PromptIOProvider {
     );
 
     const titleDisplay$ = document.createElement("div");
-    titleDisplay$.classList.add("card-header", "fs-4");
+    titleDisplay$.classList.add(
+      "card-header",
+      "fs-4",
+      "d-flex",
+      "px-4",
+      "justify-content-between",
+      "align-items-center"
+    );
+
     titleDisplay$.textContent = title;
+
+    for (const extraElement of options?.extraHeaderElements ?? []) {
+      titleDisplay$.appendChild(extraElement);
+    }
+
     container$.appendChild(titleDisplay$);
 
     const bodyContainer$ = document.createElement("div");
     bodyContainer$.classList.add(
       "card-body",
       "d-flex",
+      "flex-wrap",
       content.length >= 4 ? "flex-column" : "flex-row"
     );
 
@@ -83,11 +99,60 @@ export class HtmlIO extends PromptIOProvider {
     return container$;
   }
 
-  async message(...messages: any[]): Promise<void> {
-    const p = document.createElement("p");
-    p.textContent = `${messages.join(" ")}`;
+  async message(type: t.MessageType, ...messages: any[]): Promise<void> {
+    const container$ = document.createElement("div");
 
-    this.append(p);
+    container$.classList.add(
+      "alert",
+      "d-flex",
+      "align-items-center",
+      "md2html",
+      "row",
+      "mt-4",
+      "mb-2",
+      "border-2",
+      "shadow",
+      "fs-5"
+    );
+
+    let icon = "";
+    switch (type) {
+      case t.MessageType.Info:
+        icon = "bi-info-circle-fill";
+        container$.classList.add("alert-primary");
+        break;
+      case t.MessageType.Warning:
+        icon = "bi-exclamation-triangle-fill";
+        container$.classList.add("alert-warning");
+        break;
+      case t.MessageType.Alert:
+        icon = "bi-exclamation-triangle-fill";
+        container$.classList.add(
+          "alert-warning",
+          "border",
+          "border-danger",
+          "border-2"
+        );
+        break;
+      case t.MessageType.Success:
+        icon = "bi-check-circle-fill";
+        container$.classList.add("alert-success");
+        break;
+      case t.MessageType.Error:
+        icon = "bi-lightning-charge-fill";
+        container$.classList.add("alert-danger");
+        break;
+    }
+
+    container$.innerHTML = `
+      <div class="d-flex">
+        <span class="bi flex-shrink-0 me-3 ${icon}"></span>
+        ${await this.md2html(messages.join(" "))}
+      </div>`;
+
+    container$.setAttribute("role", "alert");
+
+    this.append(container$);
   }
 
   select<T>(options: {
@@ -109,8 +174,9 @@ export class HtmlIO extends PromptIOProvider {
           "btn-primary",
           "col",
           "py-2",
-          "text-start",
-          "fs-5"
+          "fs-5",
+          "rounded-top",
+          options.choices.length > 2 ? "text-start" : "text-center"
         );
 
         button$.addEventListener("click", () => {
@@ -132,29 +198,31 @@ export class HtmlIO extends PromptIOProvider {
         container$.append(button$);
 
         if (option.description?.trim() != null) {
-          container$.classList.add("btn-group");
-
-          const description$ = document.createElement("a");
-          description$.classList.add(
+          container$.classList.add(
             "d-flex",
-            "justify-content-center",
-            "align-items-center"
+            "flex-column",
+            "bg-primary-subtle",
+            "rounded-bottom"
           );
 
-          description$.classList.add("btn", "btn-secondary", "md2html");
-          description$.style = "max-width: fit-content";
-          description$.innerHTML = "?";
-          description$.setAttribute("tabindex", "0");
-          description$.setAttribute("role", "button");
-          description$.setAttribute("data-bs-toggle", "popover");
-          description$.setAttribute("data-bs-title", "Beschreibung");
-          description$.setAttribute("data-bs-content", option.description);
-          description$.setAttribute(
-            "data-bs-custom-class",
-            "description-popover"
-          );
+          const description$ = document.createElement("span");
 
-          new Popover(description$, { trigger: "focus" });
+          description$.innerHTML = `
+            <div class="d-flex">
+              <span class="bi flex-shrink-0 me-2 bi-info-circle-fill"></span>
+              ${await this.md2html(option.description)}
+            </div>`;
+
+          description$.classList.add(
+            "option-description",
+            "border",
+            "border-top-0",
+            "border-primary-subtle",
+            "border-3",
+            "md2html",
+            "p-2",
+            "d-none"
+          );
 
           container$.append(description$);
         } else {
@@ -164,9 +232,32 @@ export class HtmlIO extends PromptIOProvider {
         elements.push(container$);
       }
 
+      const explainButton$ = document.createElement("button");
+      explainButton$.innerHTML = "<b>?</b>";
+      explainButton$.classList.add(
+        "btn",
+        "btn-sm",
+        "btn-dark",
+        "rounded-xl",
+        "justify-self-end",
+        "w-min"
+      );
+
+      explainButton$.addEventListener("click", () => {
+        for (const button$ of buttons) {
+          button$.parentElement
+            ?.querySelector(".option-description")
+            ?.classList.toggle("d-none");
+
+          button$.parentElement?.classList.toggle("rounded-bottom");
+          button$.style.setProperty("--bs-btn-border-radius", "0");
+        }
+      });
+
       card$ = await this.createCard(options.title, elements, {
         description: options.description ?? null,
         cardClasses: ["border-primary"],
+        extraHeaderElements: [explainButton$],
       });
     });
   }

@@ -25,6 +25,7 @@
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^24.10.0",
     "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "inquirer": "^12.10.0",
     "marked": "^16.4.1",
     "parcel": "^2.16.0",

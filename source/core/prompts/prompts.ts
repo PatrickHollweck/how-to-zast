@@ -76,13 +76,13 @@ export class Prompts {
         {
           name: "Notfalleinsatz - Notfall ohne Notarzt",
           value: t.AlarmReason.Notfall,
-          description: ": RD1 - keine planmäßige Alarmierung eines NA",
+          description: "RD1 - keine planmäßige Alarmierung eines NA",
         },
         {
           name: "Notarzteinsatz - Notfall mit Notarzt",
           value: t.AlarmReason.Notarzt,
           description:
-            ": RD2 oder höher - MIT planmäßiger Beteiligung eines Notarzt",
+            "RD2 oder höher - MIT planmäßiger Beteiligung eines Notarzt",
         },
         {
           name: "Krankentransport",

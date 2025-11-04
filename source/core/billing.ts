@@ -8,7 +8,7 @@ export async function findBillingType(
   billingContext: t.BillingContextTyp
 ): Promise<[number, t.BillingType] | null> {
   if ((await ctx.prompts.szenario()) === t.CallScenario.HuLaPlaÜbernahme) {
-    return await handleVerlegung(ctx, t.BillingContextTyp.KTP, false);
+    return await handle_KTR_SZ(ctx, t.BillingContextTyp.KTP);
   }
 
   switch (billingContext) {
@@ -46,7 +46,7 @@ async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {
 async function handleDoctorCall(ctx: PromptContext): BillingTypeReturn {
   switch (await ctx.prompts.notfallSzenarioMitNA()) {
     case t.EmergencyScenario_NA.Verlegung:
-      return await handleVerlegung(ctx, t.BillingContextTyp.NA, true);
+      return await handleVerlegung(ctx, t.BillingContextTyp.NA);
     case t.EmergencyScenario_NA.Schulunfall:
     case t.EmergencyScenario_NA.ArbeitsOderWegeUnfall:
       ctx.setCached("istUrsacheBG", true);
@@ -123,8 +123,7 @@ async function handle_BG_KTR_SZ(
 
 async function handleVerlegung(
   ctx: PromptContext,
-  billingContext: t.BillingContextTyp,
-  verlegungInKrankenhaus: boolean
+  billingContext: t.BillingContextTyp
 ): BillingTypeReturn {
   const isBG = await handle_BG_SZ(ctx, billingContext);
 
@@ -132,10 +131,8 @@ async function handleVerlegung(
     return isBG;
   }
 
-  if (verlegungInKrankenhaus) {
-    if (await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()) {
-      return [getKrankenhausTarif(billingContext), t.BillingType.KHS];
-    }
+  if (await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()) {
+    return [getKrankenhausTarif(billingContext), t.BillingType.KHS];
   }
 
   return await handle_KTR_SZ(ctx, billingContext);

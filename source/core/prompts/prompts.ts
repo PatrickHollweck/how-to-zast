@@ -85,7 +85,7 @@ export class Prompts {
       title: "Wodruch wird dein Einsatz am besten beschrieben?",
       choices: [
         {
-          name: "Schul-, Wege-, oder Arbeitsunfall",
+          name: "Schul-, Wege-, Arbeitsunfall oder Ursächlich einer anerkannten Berufskrankheit",
           value:
             t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall,
         },
@@ -134,7 +134,21 @@ export class Prompts {
 
   public wahrnehmungAlsNotfall() {
     // TODO: Hilfestellung in Beschreibung - wie definiert?
-    return this.io.selectBool("Wahrnehmung am Einsatzort als Notfall?");
+    return this.io.selectBool(
+      "Wahrnehmung des Patientenzustands durch RD-Personals am Einsatzort als Notfall?",
+      `##### Definition "Rettungsfahrt" nach §5 KTP-RL - Notfall
+> Patientinnen und Patienten bedürfen einer Rettungsfahrt, wenn sie aufgrund ihres Zustands mit einem qualifizierten Rettungsmittel (Rettungswagen, Notarztwagen, Rettungshubschrauber) befördert werden müssen oder der Eintritt eines derartigen Zustands während des Transports zu erwarten ist.
+
+##### Definition "Krankentransport" nach §6 KTP-RL - Kein Notfall
+> (1) Ein Krankentransport kann verordnet werden, wenn Patientinnen oder Patienten während der Fahrt einer
+fachlichen Betreuung oder der besonderen Einrichtungen des Krankentransportwagens (KTW) bedürfen oder
+deren Erforderlichkeit aufgrund ihres Zustandes zu erwarten ist. (2) [...] soll auch dann verordnet werden, wenn dadurch die Übertragung schwerer,
+ansteckender Krankheiten [...] vermieden werden kann.
+
+<hr/>
+Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Richtlinie</a>
+`
+    );
   }
 
   public wurdePatientTransportiert() {
@@ -201,7 +215,10 @@ export class Prompts {
   }
 
   public beiEintreffenSichereTodeszeichen() {
-    return this.io.selectBool("Lagen bei Eintreffen sichere Todeszeichen vor?");
+    return this.io.selectBool(
+      "Lagen bei Eintreffen sichere Todeszeichen vor?",
+      "Auch mit Ja zu beantworten, wenn sich aktiv gegen eine Reanimation entschieden wurde und keine weitere Beahndlung stattfand!"
+    );
   }
 
   public istKrankenkasseBekannt() {

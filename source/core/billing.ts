@@ -33,6 +33,7 @@ async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {
       ctx.setCached("istUrsacheBG", true);
       return handle_BG_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);
     case t.EmergencyScenario_NF_Downgrade.SonstigerEinsatz:
+      ctx.setCached("istUrsacheBG", false);
       return handle_BG_SZ_forced(ctx, t.BillingContextTyp.KTP_Herabstufung);
     case t.EmergencyScenario_NF_Downgrade.SonstigerUnfall:
       return handle_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);

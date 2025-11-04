@@ -65,10 +65,16 @@ async function handleCallToTransport(ctx: PromptContext) {
   if (alarmType === t.AlarmReason.Notarzt) {
     await ctx.io.message(
       t.MessageType.Warning,
-      "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, muss als Notfalleinsatz abgerechnet werden!"
+      "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, kann nicht als Notarzteinsatz abgerechnet werden!"
     );
 
     ctx.setCached("dispositionsSchlagwort", t.AlarmReason.Notfall);
+  }
+
+  const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
+
+  if (alarmType === t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
+    return handleKrankentransport(ctx);
   }
 
   const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
@@ -91,7 +97,6 @@ async function handleCallToTransport(ctx: PromptContext) {
     return handleCallToTransport(ctx);
   }
 
-  const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
   const transportToHospital =
     await ctx.prompts.transportInBehandlungseinrichtung();
 
@@ -144,10 +149,6 @@ async function handleCallToTransport(ctx: PromptContext) {
       callType,
       await findBillingType(ctx, t.BillingContextTyp.KTP_Herabstufung)
     );
-  }
-
-  if (alarmType > t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
-    return handleKrankentransport(ctx);
   }
 
   throw new Error("Unreachable!");

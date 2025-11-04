@@ -261,7 +261,7 @@ export class HtmlIO extends PromptIOProvider {
         "btn-dark",
         "rounded-xl",
         "justify-self-end",
-        "w-min"
+        "align-self-centert"
       );
 
       explainButton$.addEventListener("click", () => {

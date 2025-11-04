@@ -209,43 +209,18 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
   const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
   const alarmReason = await ctx.prompts.dispositionsSchlagwort();
 
-  const callUpgradeMessage =
-    "Sobald ein durch die Leitstelle alarmierter Arzt an einem Einsatz teilnimmt, wird dieser Einsatz automatisch zum Notarzteinsatz, auch wenn die initiale Alarmierung anders war.";
-
   switch (currentVehicle) {
     case t.VehicleKind.KTW:
     case t.VehicleKind.RTW:
     case t.VehicleKind.Misc:
-      switch (alarmReason) {
-        case t.AlarmReason.Krankentransport:
-        case t.AlarmReason.Notfall:
-          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
-        case t.AlarmReason.Notarzt:
-        case t.AlarmReason.Verlegungsarzt:
-          return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);
-      }
+      return await ctx.io.displayResult(t.TransportType.NA_VA_Zubringer);
     case t.VehicleKind.NEF:
-      switch (alarmReason) {
-        case t.AlarmReason.Krankentransport:
-        case t.AlarmReason.Notfall:
-          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
-        case t.AlarmReason.Notarzt:
-          return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
-        case t.AlarmReason.Verlegungsarzt:
-          await ctx.io.message(
-            t.MessageType.Alert,
-            "Eine Alarmierung eines NEF zu einer VEF-Verlegung ist nicht möglich. Im Zweifel als Notarztverlegung abrechnen!"
-          );
-
-          return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
-      }
+      return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
     case t.VehicleKind.VEF:
       switch (alarmReason) {
         case t.AlarmReason.Krankentransport:
         case t.AlarmReason.Notfall:
         case t.AlarmReason.Notarzt:
-          await ctx.io.message(t.MessageType.Warning, callUpgradeMessage);
-
           return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
         case t.AlarmReason.Verlegungsarzt:
           return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);

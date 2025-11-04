@@ -36,7 +36,7 @@ export class Prompts {
         {
           name: "Fahrt zu Einsatz als Transportmittel",
           description:
-            "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW\nausschließlich bei Beauftragung durch zuständige ILS",
+            "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW. Ausschließlich bei Beauftragung durch zuständige ILS",
           value: t.CallScenario.Rettungsfahrt,
         },
         {
@@ -142,13 +142,13 @@ export class Prompts {
     return this.io.select({
       title: "Auf welchem Fahrzeug bist du eingesetzt?",
       choices: [
-        { name: "KTW", value: t.VehicleKind.KTW },
+        { name: "KTW / N-KTW", value: t.VehicleKind.KTW },
         { name: "RTW", value: t.VehicleKind.RTW },
         { name: "NEF", value: t.VehicleKind.NEF },
         { name: "VEF", value: t.VehicleKind.NEF },
         { name: "ITW", value: t.VehicleKind.ITW },
         {
-          name: "Sonstiges Fahrzeug - HvO, N-KTW, SEG-Fahrzeuge, ...",
+          name: "Sonstiges Fahrzeug - HvO, SEG-Fahrzeuge, ...",
           value: t.VehicleKind.Misc,
         },
       ],
@@ -157,14 +157,12 @@ export class Prompts {
 
   public warNotarztBeteiligt() {
     return this.io.selectBool(
-      "War ein Notarzt an der *VERSORGUNG* ihres Patienten beteiligt?",
+      "War ein **Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
       `
-**Nur "ja" wenn:**
-1. Notarzt ärztliche Maßnahmen (wie: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung - einzeln oder in Kombination) durchgeführt und/oder angewiesen hat!
-2. Leistungserbringung ausschließlich durch diensthabende oder von der ILS in Dienst gesetzten Verlegungs- oder Notarzt!
-
-**Auch "nein" wenn:**
-1. Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt = Notarzt hat Patient nie gesehen"`
+1. <span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**
+> Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte!</span>
+3. **Nur "Ja", wenn:** Notarzt ärztliche Maßnahme(n) (wie: Untersuchung, Anamnese, Diagnostik, Versorgung) durchgeführt und/oder angewiesen wurden!
+4. **Auch "Nein", wenn:** Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt`
     );
   }
 

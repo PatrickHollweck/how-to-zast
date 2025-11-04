@@ -33,11 +33,21 @@ export async function startPrompt(ctx: PromptContext) {
 }
 
 async function handleCallToTransport(ctx: PromptContext) {
-  const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
   const transport = await ctx.prompts.wurdePatientTransportiert();
 
   if (!transport) {
     return handleNonTransport(ctx);
+  }
+
+  const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
+
+  if (
+    doctorInvolvement &&
+    (await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport()) > 0
+  ) {
+    await ctx.messages.notarztNichtAbrechnungsfähig();
+
+    return handleNonDoctorTransport(ctx);
   }
 
   if (doctorInvolvement && transport) {
@@ -127,6 +137,10 @@ async function handleCallToTransport(ctx: PromptContext) {
   throw new Error("Unreachable!");
 }
 
+async function handleNonDoctorTransport(_ctx: PromptContext) {
+  throw new Error("Notfalleinsatzabrechnung nicht implementiert");
+}
+
 async function handleKrankentransport(ctx: PromptContext) {
   return await ctx.io.displayResult(
     t.TransportType.Verrechenbar,
@@ -150,6 +164,10 @@ async function handleNonTransport(ctx: PromptContext) {
 
   if (!doctorInvolvement) {
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
+  }
+
+  if (await ctx.prompts.abrechnungsfähigkeitNotarzt_KeinTransport()) {
+    return ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
   }
 
   await ctx.messages.hinweiseNAV();

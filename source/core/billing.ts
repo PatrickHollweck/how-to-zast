@@ -8,18 +8,18 @@ export async function findBillingType(
   billingContext: t.BillingContextTyp
 ): Promise<[number, t.BillingType] | null> {
   if ((await ctx.prompts.szenario()) === t.CallScenario.HuLaPlaÜbernahme) {
-    handleVerlegung(ctx, t.BillingContextTyp.KTP, false);
+    return await handleVerlegung(ctx, t.BillingContextTyp.KTP, false);
   }
 
   switch (billingContext) {
     case t.BillingContextTyp.KTP:
       return null;
     case t.BillingContextTyp.KTP_Herabstufung:
-      return handleKTPHerabstufung(ctx);
+      return await handleKTPHerabstufung(ctx);
     case t.BillingContextTyp.NF:
       return null;
     case t.BillingContextTyp.NA:
-      return handleDoctorCall(ctx);
+      return await handleDoctorCall(ctx);
     default:
       throw new Error(
         `Unbekannter Tarif-Context! - angegeben: "${billingContext}"`
@@ -31,31 +31,34 @@ async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {
   switch (await ctx.prompts.herabstufungGrundKTP()) {
     case t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall:
       ctx.setCached("istUrsacheBG", true);
-      return handle_BG_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);
+      return await handle_BG_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);
     case t.EmergencyScenario_NF_Downgrade.SonstigerEinsatz:
       ctx.setCached("istUrsacheBG", false);
-      return handle_BG_SZ_forced(ctx, t.BillingContextTyp.KTP_Herabstufung);
+      return await handle_BG_SZ_forced(
+        ctx,
+        t.BillingContextTyp.KTP_Herabstufung
+      );
     case t.EmergencyScenario_NF_Downgrade.SonstigerUnfall:
-      return handle_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);
+      return await handle_KTR_SZ(ctx, t.BillingContextTyp.KTP_Herabstufung);
   }
 }
 
 async function handleDoctorCall(ctx: PromptContext): BillingTypeReturn {
   switch (await ctx.prompts.notfallSzenarioMitNA()) {
     case t.EmergencyScenario_NA.Verlegung:
-      return handleVerlegung(ctx, t.BillingContextTyp.NA, true);
+      return await handleVerlegung(ctx, t.BillingContextTyp.NA, true);
     case t.EmergencyScenario_NA.Schulunfall:
     case t.EmergencyScenario_NA.ArbeitsOderWegeUnfall:
       ctx.setCached("istUrsacheBG", true);
-      return handle_BG_SZ_forced(ctx, t.BillingContextTyp.NA);
+      return await handle_BG_SZ_forced(ctx, t.BillingContextTyp.NA);
 
     case t.EmergencyScenario_NA.SonstigerNofall:
     case t.EmergencyScenario_NA.SonstigerUnfall:
-      return handle_BG_KTR_SZ(ctx, t.BillingContextTyp.NA);
+      return await handle_BG_KTR_SZ(ctx, t.BillingContextTyp.NA);
 
     case t.EmergencyScenario_NA.Internistisch:
     case t.EmergencyScenario_NA.Verkehrsunfall:
-      return handle_KTR_SZ(ctx, t.BillingContextTyp.NA);
+      return await handle_KTR_SZ(ctx, t.BillingContextTyp.NA);
 
     default:
       throw new Error("Unbekannter Notfalltyp");
@@ -115,7 +118,7 @@ async function handle_BG_KTR_SZ(
     return isBG;
   }
 
-  return handle_KTR_SZ(ctx, billingContext);
+  return await handle_KTR_SZ(ctx, billingContext);
 }
 
 async function handleVerlegung(
@@ -135,7 +138,7 @@ async function handleVerlegung(
     }
   }
 
-  return handle_KTR_SZ(ctx, billingContext);
+  return await handle_KTR_SZ(ctx, billingContext);
 }
 
 function getBerufsgenossenschaftTarif(billingContext: t.BillingContextTyp) {

@@ -42,6 +42,13 @@ Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung st
     );
   }
 
+  public async notarztNichtAbrechnungsfähig() {
+    await this.io.message(
+      t.Alert,
+      "Dieser Einsatz erfüllt nicht die Kriterien für die Abrechnung als Notarzteinsatz. Stattdessen muss ein Notfalleinsatz abgerechnet werden!"
+    );
+  }
+
   public async reparatMehrAlsEinTag() {
     await this.io.message(
       t.Warning,

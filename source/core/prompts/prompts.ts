@@ -32,9 +32,10 @@ export class Prompts {
   public szenario() {
     return this.io.select({
       title: "Was beschreibt die Hauptaufgabe der Fahrt am besten?",
+      description: "*Dein Fahrzeug wurde alarmiert weil...*",
       choices: [
         {
-          name: "Fahrt zu Einsatz als Transportmittel",
+          name: "Fahrt zu einem Einsatz als Transportmittel",
           description:
             "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW. Ausschließlich bei Beauftragung durch zuständige ILS",
           value: t.CallScenario.Rettungsfahrt,
@@ -46,7 +47,7 @@ export class Prompts {
           value: t.CallScenario.ArztZubringer,
         },
         {
-          name: "Transport eines Patient *von* oder *zu* Hubschrauberlandeplatz",
+          name: "Transport eines Patient *von* oder *zu* einem Hubschrauberlandeplatz",
           description:
             "Transport von Hubschrauberlandeplatz in Einrichtung **oder** von Einrichtung zum Hubschrauberlandeplatz. Dort dann Übernahme durch RTH oder ITH",
           value: t.CallScenario.HuLaPlaÜbernahme,
@@ -132,6 +133,64 @@ export class Prompts {
     });
   }
 
+  public abrechnungsfähigkeitNotarzt_KeinTransport() {
+    return this.io.selectBool(
+      "Wäre eine reine Hilfeleistung durch den Rettungsdienst (ohne Notarzt...) ausreichend gewesen?",
+      "Zur Orientierung: Hätte eine Nachforderung durch den Rettungsdienst stattgefunden, wenn der Notarzt nicht eh schon alarmiert gewesen wäre?"
+    );
+  }
+
+  public abrechnungsfähigkeitNotarzt_Transport() {
+    return this.io.select({
+      title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,
+      choices: [
+        {
+          name: "...stammt von einem **Luftrettungsmittel**, *und* es war kein bodengebundener Notarzt ebenfalls beteiligt",
+          description: "RTH, ITH",
+          value: 1,
+        },
+        {
+          name: "...stammt von einem ITW oder NAW, ihr Fahrzeug übernimmt nur den Transport",
+          description:
+            "In diesem Fall kann durch das Transportmittel nur ein Krankentransport abgerechnet werden. Das Notarztbesetzte Transportmittel schreibt eine NAV",
+          value: 6,
+        },
+        {
+          name: "...hat **mehrere Patienten** an dieser Einsatzstelle versorgt, für **meinen Patienten wäre jedoch keine Notarztalarmierung erfolgt**, wenn kein Notarzt vor Ort gewesen wäre",
+          description:
+            "Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn hier in der Theorie eine erneute Notarztalarmierung über die ILS erfolgt wäre.",
+          value: 6,
+        },
+        {
+          name: "...ist zum Einsatzzeitpunkt **nicht** an einem **bayerischen Notarztstandort** aktiv eingesetzt",
+          description:
+            "Notärzte die nicht in Bayern tätig sind können nicht an der Abrechnung teilnehmen. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
+          value: 2,
+        },
+        {
+          name: "...wurde **garnicht** oder **erst nachträglich** durch Meldung der KVB an die ILS in Dienst versetzt",
+          description:
+            "Ausschließlich die zuständige ILS kann einen Notarzt in seiner Rolle in Dienst versetzen. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
+          value: 3,
+        },
+        {
+          name: "...hat **keine** abrechnungsfähig ärztliche Leistung vollbracht",
+          description:
+            "Ärztliche Maßnahmen: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung (Therapie). Trifft nur äußerst selten zu, da bereits eine einfache Anamnese eine verrechenbare Leistung ist.",
+          value: 4,
+        },
+        {
+          name: "...ist kein diensthabender Notarzt, sondern ein Klinik-, Hausarzt-, oder ein zufällig anwesender Arzt (egal ob mit oder ohne Notarztqualifikation)",
+          description:
+            "Ein nicht in Dienst gestellter Arzt nimmt nicht an der Abrechnung teil. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen.",
+          value: 5,
+        },
+        { name: "...ist als **Hintergrundnotarzt** tätig geworden", value: 5 },
+        { name: "**Keine Aussage trifft zu**", value: 0 },
+      ],
+    });
+  }
+
   public wahrnehmungAlsNotfall() {
     // TODO: Hilfestellung in Beschreibung - wie definiert?
     return this.io.selectBool(
@@ -153,7 +212,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 
   public wurdePatientTransportiert() {
     return this.io.selectBool(
-      "Wurde ein Patient mit ihrem Fahrzeug transportiert?",
+      "Wurde ein Patient mit **ihrem** Fahrzeug **transportiert**?",
       `
 - **Auch "Ja" bei:**
   1. Transport von Einsatzstelle **zu** luftgebundenem Rettungsmittel (RTH, ITH).
@@ -161,23 +220,6 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 - **Auch "Nein" wenn:** Reanimation während Transport eingestellt wurde.
 - Genauer Zielort nicht relevant! Was zählt ist das "erreichen" des definierten Zielorts.`
     );
-  }
-
-  public bodengebundenerTransport() {
-    return this.io.select({
-      title: "Wie wurde der Patient zum Ziel transportiert?",
-      choices: [
-        {
-          name: "Mit bodengebundenem Rettungsmittel",
-          description: "KTW, N-KTW, RTW, ...",
-          value: 0,
-        },
-        {
-          name: "Mit einem luftgebundenem Rettungsmittel, welcher dann zum Krankenhaus transportiert hat",
-          value: 1,
-        },
-      ],
-    });
   }
 
   public welchesEingesetzteFahrzeug() {
@@ -200,24 +242,22 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
   public warNotarztBeteiligt() {
     return this.io.selectBool(
       "War ein **diensthabender Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
-      `
-1. <span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**
-> Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte!</span>
-3. **Nur "Ja", wenn:** Notarzt ärztliche Maßnahme(n) (wie: Untersuchung, Anamnese, Diagnostik, Versorgung) durchgeführt und/oder angewiesen wurden!
-4. **Auch "Nein", wenn:** Alarmierung als Notarzteinsatz, Notarzt wurde jedoch vor Eintreffen abbestellt`
+      `<span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**</span>
+      Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte welche **aktiv** an der Patientenversorgung teilgenommen haben!`
     );
   }
 
   public wurdePatientAngetroffen() {
     return this.io.selectBool(
-      "Wurde ein Patient durch den Rettungsdienst angetroffen?"
+      "Wurde ein Patient durch den Rettungsdienst angetroffen?",
+      `Beispiele für "nein": Vorsorgliche Bereitstellung, Kein Patient auffindbar, Dein Fahrzeug wurde durch die ILS abbestellt`
     );
   }
 
   public beiEintreffenSichereTodeszeichen() {
     return this.io.selectBool(
       "Lagen bei Eintreffen sichere Todeszeichen vor?",
-      "Auch mit Ja zu beantworten, wenn sich aktiv gegen eine Reanimation entschieden wurde und keine weitere Beahndlung stattfand!"
+      `Wenn eine Reanimation stattfand, auch wenn diese erfolglos war (!), muss diese Frage mit Nein beantwortet werden.`
     );
   }
 

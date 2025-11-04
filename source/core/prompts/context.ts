@@ -1,4 +1,6 @@
 import { Prompts } from "./prompts.js";
+import { Messages } from "../io/messages.js";
+
 import type { PromptIOProvider } from "../io/io-provider.js";
 
 import {
@@ -9,6 +11,7 @@ import {
 export class PromptContext {
   public io: PromptIOProvider;
   public prompts: Prompts;
+  public messages: Messages;
 
   private cache: Map<string, any>;
 
@@ -16,6 +19,7 @@ export class PromptContext {
     this.io = io;
     this.cache = new Map();
     this.prompts = this.memoize(new Prompts(io));
+    this.messages = new Messages(io);
   }
 
   private memoize(prompts: Prompts) {

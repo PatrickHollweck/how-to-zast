@@ -79,19 +79,13 @@ async function handle_BG_SZ(
     return null;
   }
 
-  await ctx.io.message(
-    t.MessageType.Info,
-    "Name und Anschrift des Arbeitgeber (bzw. Schule) in ZAST-Info Feld oder auf Transportschein notieren!"
-  );
+  await ctx.messages.hinweisEintragungAbrechnungsdatenBG();
 
   if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
     return [getBerufsgenossenschaftTarif(billingContext), t.BillingType.BG];
   }
 
-  await ctx.io.message(
-    t.MessageType.Info,
-    "In diesem Fall muss eine Privatrechnung ausgestellt werden. Der Patient kann diese nach Klärung des Trägers einreichen!"
-  );
+  await ctx.messages.hinweiseUnbekannterKTR();
 
   return [getSelbstzahlerTarif(billingContext), t.BillingType.SZ];
 }
@@ -106,10 +100,7 @@ async function handle_BG_SZ_forced(
     return isBG;
   }
 
-  await ctx.io.message(
-    t.MessageType.Error,
-    "Dieser Einsatz kann nur durch die Berufsgenossenschaft oder als Selbstzahler abgerechnet werden. Beides ist aufgrund der Anfgaben nicht möglich. Bitte prüfe deine Antworten!"
-  );
+  await ctx.messages.keinKostenträgerFehlermeldung();
 
   throw new Error("Abrechnung nicht möglich!");
 }

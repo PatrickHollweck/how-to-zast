@@ -5,11 +5,7 @@ import type { PromptContext } from "./prompts/context.js";
 
 export async function startPrompt(ctx: PromptContext) {
   if ((await ctx.prompts.vorhaltung()) === t.ProvisionType.Sondereinsatz) {
-    await ctx.io.message(
-      t.MessageType.Alert,
-      "In diesem Tool sind Sondereinsätze aktuell nicht verpflegt."
-    );
-
+    await ctx.messages.sondereinsätzeNichtVerpflegt();
     return await ctx.io.displayResult(t.TransportType.Sonstig);
   }
 
@@ -27,11 +23,7 @@ export async function startPrompt(ctx: PromptContext) {
     case t.CallScenario.Dienstfahrt:
       return await ctx.io.displayResult(t.TransportType.Dienstfahrt);
     case t.CallScenario.Werkstattfahrt:
-      await ctx.io.message(
-        t.MessageType.Warning,
-        "Dauert die Reparatur länger als einen Tag, muss für die Rückfahrt eine zweite Fahrt mit Nummer gebucht werden."
-      );
-
+      await ctx.messages.reparatMehrAlsEinTag();
       return await ctx.io.displayResult(t.TransportType.Werkstattfahrt);
     case t.CallScenario.Gebietsabsicherung:
       return await ctx.io.displayResult(t.TransportType.Gebietsabsicherung);
@@ -63,11 +55,7 @@ async function handleCallToTransport(ctx: PromptContext) {
   }
 
   if (alarmType === t.AlarmReason.Notarzt) {
-    await ctx.io.message(
-      t.MessageType.Warning,
-      "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, kann nicht als Notarzteinsatz abgerechnet werden!"
-    );
-
+    await ctx.messages.disponierterNotarzteinsatzOhneNotarzt();
     ctx.setCached("dispositionsSchlagwort", t.AlarmReason.Notfall);
   }
 
@@ -87,11 +75,7 @@ async function handleCallToTransport(ctx: PromptContext) {
       t.VehicleKind.Misc,
     ].includes(currentVehicle)
   ) {
-    await ctx.io.message(
-      t.MessageType.Error,
-      "Abrechnung unmöglich! Ihr gewähltes Fahrzeug ist kein zugelassenes Transportmittel und kann somit keinen Transport abrechnen! Wählen sie ein anderes Einsatzmittel"
-    );
-
+    await ctx.messages.keinTransportmittel();
     ctx.flushCached("welchesEingesetzteFahrzeug");
 
     return handleCallToTransport(ctx);
@@ -106,15 +90,7 @@ async function handleCallToTransport(ctx: PromptContext) {
     currentVehicle === t.VehicleKind.KTW &&
     transportToHospital
   ) {
-    await ctx.io.message(
-      t.MessageType.Warning,
-      `**Hochstufung auf Notfalleinsatz nicht erlaubt!**
-      <hr/>
-      Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung stand, oder sich ein Einsatztaktischer Vorteil durch KTW Transport ergibt!
-      <hr/>
-      **Eintrag in ZAST-Info Feld: "KTP-NOTFALL" vornehmen!**
-      `
-    );
+    ctx.messages.ktpNotfallHerabstufung();
 
     return ctx.io.displayResult(
       t.TransportType.Verrechenbar,
@@ -128,10 +104,7 @@ async function handleCallToTransport(ctx: PromptContext) {
     transportToHospital &&
     !perceptionAsEmergency
   ) {
-    await ctx.io.message(
-      t.MessageType.Warning,
-      `Wird ein als Notfall disponierter Einsatz vor Ort nicht als Notfall wahrgenommen ist eine **herabstufung auf einen Krankentransport verpflichtend!**<hr/>**Eintrag in ZAST-Info Feld: "NOTFALL-ALARMIERUNG" vornehmen**`
-    );
+    await ctx.messages.disponierterNotfallNichtSoWahrgenommen();
 
     const downgradeReason = await ctx.prompts.herabstufungGrundKTP();
 
@@ -155,7 +128,6 @@ async function handleCallToTransport(ctx: PromptContext) {
 }
 
 async function handleKrankentransport(ctx: PromptContext) {
-  // TODO: Implement
   return await ctx.io.displayResult(
     t.TransportType.Verrechenbar,
     t.CallType.KTP_zum_KH,
@@ -169,10 +141,7 @@ async function handleNonTransport(ctx: PromptContext) {
   }
 
   if (await ctx.prompts.beiEintreffenSichereTodeszeichen()) {
-    await ctx.io.message(
-      t.MessageType.Info,
-      "Liegen beim Eintreffen des Rettungsdienstes sichere Todeszeichen vor, ist keine Abrechnung durch den Rettungsdienst möglich!"
-    );
+    await ctx.messages.beiEintreffenSichereTodeszeichen();
 
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
   }
@@ -183,14 +152,7 @@ async function handleNonTransport(ctx: PromptContext) {
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
   }
 
-  await ctx.io.message(
-    t.MessageType.Info,
-    `
-**Zu beachten:**
-1. Als Transportweg ist von \"Notarztversorgung\" nach \"Patienten- oder Behandlungsadresse\" anzugeben
-2. Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn im Regelfall eine erneute Notarztalarmierung über die ILS erfolgt wäre
-3. Bei einem MANV ist die Abrechnungen mit der ZAST GmbH direkt zu klären!`
-  );
+  await ctx.messages.hinweiseNAV();
 
   switch (await ctx.prompts.notfallSzenarioMitNA()) {
     case t.EmergencyScenario_NA.Verkehrsunfall:
@@ -210,10 +172,7 @@ async function handleNonTransport(ctx: PromptContext) {
         await findBillingType(ctx, t.BillingContextTyp.NA)
       );
     case t.EmergencyScenario_NA.Verlegung:
-      await ctx.io.message(
-        t.MessageType.Error,
-        "**Fehler:** Eine Verlegung ohne Transport gibt es nicht... Dieses Einsatzszenario ist so nicht möglich."
-      );
+      await ctx.messages.verlegungOhneTransportFehlermeldung();
   }
 }
 

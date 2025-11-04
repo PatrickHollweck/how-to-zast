@@ -41,6 +41,12 @@ export const enum EmergencyScenario_NA {
   SonstigerNofall,
 }
 
+export const enum EmergencyScenario_NF_Downgrade {
+  ArbeitsOderWegeOderSchulUnfall,
+  SonstigerUnfall,
+  SonstigerEinsatz,
+}
+
 export const enum ProvisionType {
   Regelvorhaltung,
   Sondereinsatz,
@@ -48,6 +54,7 @@ export const enum ProvisionType {
 
 export const enum BillingContextTyp {
   KTP,
+  KTP_Herabstufung,
   NF,
   NA,
 }

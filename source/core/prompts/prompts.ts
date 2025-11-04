@@ -73,9 +73,37 @@ export class Prompts {
     });
   }
 
+  public transportInBehandlungseinrichtung() {
+    return this.io.selectBool(
+      "Wurde in eine Behandlungseinrichtung transportiert?",
+      "Beispiel: Krankenhaus, Arztpraxis, ..."
+    );
+  }
+
+  public herabstufungGrundKTP() {
+    return this.io.select({
+      title: "Wodruch wird dein Einsatz am besten beschrieben?",
+      choices: [
+        {
+          name: "Schul-, Wege-, oder Arbeitsunfall",
+          value:
+            t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall,
+        },
+        {
+          name: "Sonstiger Unfall (Traumatisch)",
+          value: t.EmergencyScenario_NF_Downgrade.SonstigerUnfall,
+        },
+        {
+          name: "Sonstiger Einsatz (Internistisch, Neurologisch, ...)",
+          value: t.EmergencyScenario_NF_Downgrade.SonstigerEinsatz,
+        },
+      ],
+    });
+  }
+
   public dispositionsSchlagwort() {
     return this.io.select({
-      title: "Disposition des Einssatzes als...",
+      title: "Disposition des Einsatzes als...",
       description:
         "Was steht als Stichwort im Alarmtext? Hier geht es um das letztendlich durch die Leitstelle gewählte Stichwort",
       choices: [
@@ -96,7 +124,7 @@ export class Prompts {
           description: "#RD#KTP#90XX - auch Prio.2 (#9017) Einsätze!",
         },
         {
-          name: "Einsatz mit Verlegungsarzt",
+          name: "VEF Verlegung",
           value: t.AlarmReason.Verlegungsarzt,
           description: "typischerweise: #RD#VEF",
         },
@@ -157,7 +185,7 @@ export class Prompts {
 
   public warNotarztBeteiligt() {
     return this.io.selectBool(
-      "War ein **Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
+      "War ein **diensthabender Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
       `
 1. <span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**
 > Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte!</span>

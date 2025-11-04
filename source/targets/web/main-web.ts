@@ -11,7 +11,10 @@ async function main() {
   } catch (error: unknown) {
     console.error(error);
 
-    ctx.io.message(MessageType.Error, error);
+    ctx.io.message(
+      MessageType.Error,
+      `Es ist ein Software-Fehlr aufgetreten! Bitte melden!<hr/>${error}`
+    );
   }
 }
 

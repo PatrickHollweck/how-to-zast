@@ -92,13 +92,25 @@ async function handleCallToTransport(ctx: PromptContext) {
   }
 
   const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
+  const transportToHospital =
+    await ctx.prompts.transportInBehandlungseinrichtung();
 
   if (
     alarmType === t.AlarmReason.Krankentransport &&
     perceptionAsEmergency &&
-    currentVehicle === t.VehicleKind.KTW
+    currentVehicle === t.VehicleKind.KTW &&
+    transportToHospital
   ) {
-    // TODO: Explizite Frage: RTW verfügbar?
+    await ctx.io.message(
+      t.MessageType.Warning,
+      `**Hochstufung auf Notfalleinsatz nicht erlaubt!**
+      <hr/>
+      Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung stand, oder sich ein Einsatztaktischer Vorteil durch KTW Transport ergibt!
+      <hr/>
+      **Eintrag in ZAST-Info Feld: "KTP-NOTFALL" vornehmen!**
+      `
+    );
+
     return ctx.io.displayResult(
       t.TransportType.Verrechenbar,
       t.CallType.KTP_Notfall,
@@ -106,11 +118,50 @@ async function handleCallToTransport(ctx: PromptContext) {
     );
   }
 
-  if (alarmType > t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
-    // TODO: Abrechnung KTP
-    throw new Error("Not implemented yet");
+  if (
+    alarmType > t.AlarmReason.Krankentransport &&
+    transportToHospital &&
+    !perceptionAsEmergency
+  ) {
+    await ctx.io.message(
+      t.MessageType.Warning,
+      `Wird ein als Notfall disponierter Einsatz vor Ort nicht als Notfall wahrgenommen ist eine **herabstufung auf einen Krankentransport verpflichtend!**<hr/>**Eintrag in ZAST-Info Feld: "NOTFALL-ALARMIERUNG" vornehmen**`
+    );
+
+    const downgradeReason = await ctx.prompts.herabstufungGrundKTP();
+
+    const callType = {
+      [t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall]:
+        t.CallType.KTP_BG_Unfall,
+      [t.EmergencyScenario_NF_Downgrade.SonstigerUnfall]:
+        t.CallType.KTP_Sonstiger_Unfall,
+      [t.EmergencyScenario_NF_Downgrade.SonstigerEinsatz]:
+        t.CallType.KTP_zum_KH,
+    }[downgradeReason];
+
+    return await ctx.io.displayResult(
+      t.TransportType.Verrechenbar,
+      callType,
+      await findBillingType(ctx, t.BillingContextTyp.KTP_Herabstufung)
+    );
   }
+
+  if (alarmType > t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
+    return handleKrankentransport(ctx);
+  }
+
+  throw new Error("Unreachable!");
 }
+
+async function handleKrankentransport(ctx: PromptContext) {
+  // TODO: Implement
+  return await ctx.io.displayResult(
+    t.TransportType.Verrechenbar,
+    t.CallType.KTP_zum_KH,
+    await findBillingType(ctx, t.BillingContextTyp.KTP)
+  );
+}
+
 async function handleNonTransport(ctx: PromptContext) {
   if (!(await ctx.prompts.wurdePatientAngetroffen())) {
     return await ctx.io.displayResult(t.TransportType.Leerfahrt);

@@ -176,6 +176,21 @@ async function handleTransportWithDoctorInvolvement(ctx: PromptContext) {
     [t.EmergencyScenario_NA.SonstigerNofall]: t.CallType.NA_Sonstiger_Notfall,
   }[await ctx.prompts.notfallSzenarioMitNA()];
 
+  if ((callType = t.CallType.NA_Sonstiger_Notfall)) {
+    const isKhsTarif = await ctx.io.selectBool(
+      "Wurde von einem Krankenhaus abtransportiert *und* gibt es einen triftigen Grund weshalb das Krankenhaus die Kosten für den Transport tragen muss?",
+      "Beispiel: Keine zwingende Begründung für Transport mit Notarzt!"
+    );
+
+    if (isKhsTarif) {
+      return await ctx.io.displayResult(
+        t.TransportType.Verrechenbar,
+        callType,
+        [t.BillingTariff.NA_KHS, t.BillingType.KHS]
+      );
+    }
+  }
+
   return await ctx.io.displayResult(
     t.TransportType.Verrechenbar,
     callType,

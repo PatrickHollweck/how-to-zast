@@ -154,6 +154,13 @@ async function handleNonTransport(ctx: PromptContext) {
     return await ctx.io.displayResult(t.TransportType.Leerfahrt);
   }
 
+  const otherVehicleTransported =
+    await ctx.prompts.anderesFahrzeugTransportiert();
+
+  if (otherVehicleTransported) {
+    return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
+  }
+
   if (await ctx.prompts.beiEintreffenSichereTodeszeichen()) {
     await ctx.messages.beiEintreffenSichereTodeszeichen();
 

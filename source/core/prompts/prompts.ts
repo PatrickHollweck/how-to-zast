@@ -140,6 +140,13 @@ export class Prompts {
     );
   }
 
+  public anderesFahrzeugTransportiert() {
+    return this.io.selectBool(
+      "War ein anderes Fahrzeug beteiligt, welches den Transport des Patienten übernommen hat?",
+      "Beispiel: KTW zur Erstversorgung, RTW übernimmt dann Transport"
+    );
+  }
+
   public abrechnungsfähigkeitNotarzt_Transport() {
     return this.io.select({
       title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,

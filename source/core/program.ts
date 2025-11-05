@@ -236,7 +236,6 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
   }
 
   const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
-  const alarmReason = await ctx.prompts.dispositionsSchlagwort();
 
   switch (currentVehicle) {
     case t.VehicleKind.KTW:
@@ -246,6 +245,8 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
     case t.VehicleKind.NEF:
       return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
     case t.VehicleKind.VEF:
+      const alarmReason = await ctx.prompts.dispositionsSchlagwort();
+
       switch (alarmReason) {
         case t.AlarmReason.Krankentransport:
         case t.AlarmReason.Notfall:

@@ -15,7 +15,7 @@ export class Prompts {
         "Fand dein Einsatz im Rahmen des Hauptaufgabengebietes nach BayRDG statt?",
       choices: [
         {
-          name: "Regelvorhaltung",
+          name: "**Regelvorhaltung**",
           value: t.ProvisionType.Regelvorhaltung,
           description:
             "Rettungsmittel die öffentlich-rechtlich regelhaft vorgehalten werden",

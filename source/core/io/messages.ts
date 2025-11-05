@@ -13,9 +13,12 @@ export class Messages {
       t.Warning,
       `
 **Hochstufung auf Notfalleinsatz nicht erlaubt!**
-<hr/>
-Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung stand, oder sich ein Einsatztaktischer Vorteil durch KTW Transport ergibt!
-<hr/>
+
+---
+
+Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung stand, oder sich ein Einsatztaktischer Vorteil durch KTW Transport ergibt!
+
+---
 **Eintrag in ZAST-Info Feld: "KTP-NOTFALL" vornehmen!**
 `
     );

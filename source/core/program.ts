@@ -39,6 +39,76 @@ async function handleCallToTransport(ctx: PromptContext) {
     return handleNonTransport(ctx);
   }
 
+  const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
+  const alarmType = await ctx.prompts.dispositionsSchlagwort();
+
+  switch (alarmType) {
+    case t.AlarmReason.Krankentransport:
+    case t.AlarmReason.Notfall:
+    case t.AlarmReason.Notarzt:
+      if ([t.VehicleKind.NEF, t.VehicleKind.VEF].includes(currentVehicle)) {
+        await ctx.messages.keinTransportmittel();
+
+        return handleDoctorTransportToCallSite(ctx);
+      }
+
+      break;
+    case t.AlarmReason.Verlegungsarzt:
+      if ([t.VehicleKind.NAW, t.VehicleKind.NEF].includes(currentVehicle)) {
+        return ctx.messages.nefZuVefVerlegung();
+      }
+
+      break;
+    case t.AlarmReason.ITW:
+      if (currentVehicle !== t.VehicleKind.ITW) {
+        return ctx.messages.dispositionVonNichtITWZuITWEinsatz();
+      }
+  }
+
+  switch (currentVehicle) {
+    case t.VehicleKind.KTW:
+    case t.VehicleKind.RTW:
+      if (alarmType === t.AlarmReason.Verlegungsarzt) {
+        return await ctx.io.displayResult(
+          t.TransportType.Verrechenbar,
+          t.CallType.NA_Verlegung,
+          await findBillingType(ctx, t.BillingContextTyp.NA)
+        );
+      }
+
+      if (alarmType === t.AlarmReason.Notarzt) {
+        await ctx.messages.disponierterNotarzteinsatzOhneNotarzt();
+        ctx.setCached("dispositionsSchlagwort", t.AlarmReason.Notfall);
+      }
+
+      break;
+
+    case t.VehicleKind.ITW:
+      if (alarmType === t.AlarmReason.ITW) {
+        return await ctx.io.displayResult(
+          t.TransportType.Verrechenbar,
+          t.CallType.NF_ITW,
+          await findBillingType(ctx, t.BillingContextTyp.NF)
+        );
+      }
+
+    // -- fallthrough...
+    case t.VehicleKind.NAW:
+      ctx.setCached("warNotarztBeteiligt", true);
+
+      ctx.setCached(
+        "abrechnungsfähigkeitNotarzt_Transport",
+        t.DoctorNotBillableReason.KeinGrund
+      );
+
+      break;
+    case t.VehicleKind.NEF:
+    case t.VehicleKind.VEF:
+      await ctx.messages.keinTransportmittel();
+
+      return handleDoctorTransportToCallSite(ctx);
+  }
+
   const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
 
   if (doctorInvolvement) {
@@ -48,19 +118,38 @@ async function handleCallToTransport(ctx: PromptContext) {
     switch (isDoctorBillable) {
       case t.DoctorNotBillableReason.KeinGrund:
         break;
-      case t.DoctorNotBillableReason.NAW_ITW:
-        return await ctx.io.displayResult(
-          t.TransportType.Verrechenbar,
-          t.CallType.KTP_zum_KH,
-          await findBillingType(ctx, t.BillingContextTyp.KTP_Herabstufung)
-        );
       case t.DoctorNotBillableReason.NichtImDienst:
       case t.DoctorNotBillableReason.KeineLeistung:
       case t.DoctorNotBillableReason.MehrerePatienten:
       case t.DoctorNotBillableReason.Luftrettungsmittel:
         await ctx.messages.notarztNichtAbrechnungsfähig();
+        ctx.setCached("warNotarztBeteiligt", false);
 
         return handleNonDoctorTransport(ctx);
+      case t.DoctorNotBillableReason.NAW_ITW:
+        const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
+
+        switch (currentVehicle) {
+          case t.VehicleKind.KTW:
+          case t.VehicleKind.RTW:
+            await ctx.messages.transportBeiVersorgungDurchNAW();
+
+            return await ctx.io.displayResult(
+              t.TransportType.Verrechenbar,
+              t.CallType.KTP_zum_KH,
+              await findBillingType(ctx, t.BillingContextTyp.KTP_Herabstufung)
+            );
+          case t.VehicleKind.NEF:
+          case t.VehicleKind.VEF:
+            return await ctx.messages.keinTransportmittel();
+          case t.VehicleKind.NAW:
+            return await ctx.messages.nawOhneArzt();
+          case t.VehicleKind.ITW:
+            await ctx.messages.notarztNichtAbrechnungsfähig();
+            ctx.setCached("warNotarztBeteiligt", false);
+
+            return handleNonDoctorTransport(ctx);
+        }
     }
   }
 
@@ -68,41 +157,10 @@ async function handleCallToTransport(ctx: PromptContext) {
     return handleTransportWithDoctorInvolvement(ctx);
   }
 
-  const alarmType = await ctx.prompts.dispositionsSchlagwort();
-
-  if (alarmType === t.AlarmReason.Verlegungsarzt) {
-    return await ctx.io.displayResult(
-      t.TransportType.Verrechenbar,
-      t.CallType.NA_Verlegung,
-      await findBillingType(ctx, t.BillingContextTyp.NA)
-    );
-  }
-
-  if (alarmType === t.AlarmReason.Notarzt) {
-    await ctx.messages.disponierterNotarzteinsatzOhneNotarzt();
-    ctx.setCached("dispositionsSchlagwort", t.AlarmReason.Notfall);
-  }
-
   const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
 
   if (alarmType === t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
     return handleKrankentransport(ctx);
-  }
-
-  const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
-
-  if (
-    ![
-      t.VehicleKind.KTW,
-      t.VehicleKind.RTW,
-      t.VehicleKind.ITW,
-      t.VehicleKind.Misc,
-    ].includes(currentVehicle)
-  ) {
-    await ctx.messages.keinTransportmittel();
-    ctx.flushCached("welchesEingesetzteFahrzeug");
-
-    return handleCallToTransport(ctx);
   }
 
   const transportToHospital =
@@ -183,7 +241,6 @@ async function handleNonTransport(ctx: PromptContext) {
       case t.VehicleKind.RTW:
       case t.VehicleKind.NEF:
       case t.VehicleKind.VEF:
-      case t.VehicleKind.Misc:
         return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
       case t.VehicleKind.NAW:
       case t.VehicleKind.ITW:
@@ -264,21 +321,11 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
   switch (currentVehicle) {
     case t.VehicleKind.KTW:
     case t.VehicleKind.RTW:
-    case t.VehicleKind.Misc:
       return await ctx.io.displayResult(t.TransportType.NA_VA_Zubringer);
     case t.VehicleKind.NEF:
       return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
     case t.VehicleKind.VEF:
-      const alarmReason = await ctx.prompts.dispositionsSchlagwort();
-
-      switch (alarmReason) {
-        case t.AlarmReason.Krankentransport:
-        case t.AlarmReason.Notfall:
-        case t.AlarmReason.Notarzt:
-          return await ctx.io.displayResult(t.TransportType.NEF_Einsatz);
-        case t.AlarmReason.Verlegungsarzt:
-          return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);
-      }
+      return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);
     case t.VehicleKind.ITW:
     case t.VehicleKind.NAW:
       return handleNonTransport(ctx);

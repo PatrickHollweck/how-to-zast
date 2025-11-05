@@ -21,7 +21,7 @@ export class Prompts {
             "Rettungsmittel die öffentlich-rechtlich regelhaft vorgehalten werden",
         },
         {
-          name: "Sondereinsatz",
+          name: "Sonderbedarf",
           value: t.ProvisionType.Sondereinsatz,
           description: "z.B: LRD, UGRD, ORGL, ELRD, HvO, SEG-Einsatz",
         },
@@ -109,12 +109,12 @@ export class Prompts {
         "Was steht als Stichwort im Alarmtext? Hier geht es um das letztendlich durch die Leitstelle gewählte Stichwort",
       choices: [
         {
-          name: "Notfalleinsatz - Notfall ohne Notarzt",
+          name: "**Notfall**einsatz - Notfall ohne Notarzt",
           value: t.AlarmReason.Notfall,
           description: "RD1 - keine planmäßige Alarmierung eines NA",
         },
         {
-          name: "Notarzteinsatz - Notfall mit Notarzt",
+          name: "**Notarzt**einsatz - Notfall mit Notarzt",
           value: t.AlarmReason.Notarzt,
           description:
             "RD2 oder höher - MIT planmäßiger Beteiligung eines Notarzt",
@@ -128,6 +128,11 @@ export class Prompts {
           name: "VEF Verlegung",
           value: t.AlarmReason.Verlegungsarzt,
           description: "typischerweise: #RD#VEF",
+        },
+        {
+          name: "ITW Einsatz",
+          value: t.AlarmReason.ITW,
+          description: "Nur bei Verwendung des Stichworts: #RD#ITW durch ILS",
         },
       ],
     });
@@ -157,7 +162,7 @@ export class Prompts {
           value: t.DoctorNotBillableReason.Luftrettungsmittel,
         },
         {
-          name: "...stammt von einem ITW oder NAW, ihr Fahrzeug übernimmt nur den Transport",
+          name: "...stammt von einem **ITW** oder **NAW**, ihr Fahrzeug übernimmt nur den Transport",
           description:
             "In diesem Fall kann durch das Transportmittel nur ein Krankentransport abgerechnet werden. Das Notarztbesetzte Transportmittel schreibt eine NAV",
           value: t.DoctorNotBillableReason.NAW_ITW,
@@ -227,11 +232,9 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
     return this.io.selectBool(
       "Wurde ein Patient mit **ihrem** Fahrzeug **transportiert**?",
       `
-- **Auch "Ja" bei:**
-  1. Transport von Einsatzstelle **zu** luftgebundenem Rettungsmittel (RTH, ITH).
-  2. Einsatz als NAW (RTW + NA, ohne seperates Einsatzmittel, zugestiegen).
+- **Auch "Ja" bei:** Transport von Einsatzstelle **zu** luftgebundenem Rettungsmittel (RTH, ITH).
 - **Auch "Nein" wenn:** Reanimation während Transport eingestellt wurde.
-- Genauer Zielort nicht relevant! Was zählt ist das "erreichen" des definierten Zielorts.`
+- Genauer Zielort nicht relevant! Was zählt ist das "erreichen" eines vordefinierten Zielorts.`
     );
   }
 
@@ -242,13 +245,9 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
         { name: "KTW / N-KTW", value: t.VehicleKind.KTW },
         { name: "RTW", value: t.VehicleKind.RTW },
         { name: "NEF", value: t.VehicleKind.NEF },
-        { name: "VEF", value: t.VehicleKind.NEF },
+        { name: "VEF", value: t.VehicleKind.VEF },
         { name: "NAW", value: t.VehicleKind.NAW },
         { name: "ITW", value: t.VehicleKind.ITW },
-        {
-          name: "Sonstiges Fahrzeug - HvO, SEG-Fahrzeuge, ...",
-          value: t.VehicleKind.Misc,
-        },
       ],
     });
   }
@@ -306,9 +305,63 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
     );
   }
 
+  public notfallSzenarioOhneNA() {
+    return this.io.select({
+      title: "Was beschreibt deinen Einsatz am besten?",
+      choices: [
+        {
+          name: "Arbeitsunfall / Wegeunfall",
+          value: t.EmergencyScenario_NA.ArbeitsOderWegeUnfall,
+          description:
+            "Notarzteinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
+        },
+        {
+          name: "Schulunfall",
+          value: t.EmergencyScenario_NA.Schulunfall,
+          description:
+            "Notarzteinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
+        },
+        {
+          name: "Verkehrsunfall",
+          value: t.EmergencyScenario_NA.Verkehrsunfall,
+          description: "Unfall mit Verkehrsfahrzeug jeder Art",
+        },
+        {
+          name: "Verlegung",
+          value: t.EmergencyScenario_NA.Verlegung,
+          description: "Verlegung von KHS A nach KHS B",
+        },
+        {
+          name: "Internistischer Notfall",
+          value: t.EmergencyScenario_NA.Internistisch,
+          description:
+            "Jeder Internistische Nofall. Auch: Reanimation mit internistischer Ursache",
+        },
+        {
+          name: "Sonstiger Unfall",
+          value: t.EmergencyScenario_NA.SonstigerUnfall,
+          description:
+            "Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
+        },
+        {
+          name: "Sonstiger Notfall",
+          value: t.EmergencyScenario_NA.SonstigerNofall,
+          description:
+            "Notarzteinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
+        },
+        {
+          name: "Neugeborenen Holdienst",
+          value: t.EmergencyScenario_NA.ArbeitsOderWegeUnfall,
+          description:
+            "Abholung des Behandlungsteams und Transport zum anfordernden KHS. Transport des Behandlungsteam und des Neugeborenen in das Kinder-KHS",
+        },
+      ],
+    });
+  }
+
   public notfallSzenarioMitNA() {
     return this.io.select({
-      title: "Was beschreibt das Einsatzszenario am besten?",
+      title: "Was beschreibt deinen Einsatz am besten?",
       description: `
 - Arbeits-, Wege-, und Schulunfälle dürfen **nicht** als als Verkehrsunfall oder "Sonstiger Unfall" abgerechnet werden, wenn ein direkter Zusammenhang zwischen der schulischen oder beruflichen Tätigkeit besteht! Weil diese Einsätze nicht über die Berufsgenossenschaft abgerechnet werden können
 - Internistische Notfälle können **nicht**, als "Unfall" abgerechnet werden. Beispiel: Ein Herzinfarkt am Arbeitsplatz ist keine BG-Sache!

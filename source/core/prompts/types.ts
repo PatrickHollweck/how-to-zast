@@ -11,6 +11,7 @@ export const enum AlarmReason {
   Notfall,
   Notarzt,
   Verlegungsarzt,
+  ITW,
 }
 
 export const enum VehicleKind {
@@ -20,7 +21,6 @@ export const enum VehicleKind {
   VEF,
   NAW,
   ITW,
-  Misc,
 }
 
 export const enum CallScenario {

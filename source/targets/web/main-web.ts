@@ -13,7 +13,7 @@ async function main() {
 
     ctx.io.message(
       MessageType.Error,
-      `Es ist ein Software-Fehlr aufgetreten! Bitte melden!<hr/>${error}`
+      `Es ist ein Software-Fehler aufgetreten! Bitte melden!<hr/>${error}`
     );
   }
 }

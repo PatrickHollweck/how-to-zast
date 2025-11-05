@@ -17,7 +17,7 @@ export async function findBillingType(
     case t.BillingContextTyp.KTP_Herabstufung:
       return await handleKTPHerabstufung(ctx);
     case t.BillingContextTyp.NF:
-      return null;
+      return await handleNF(ctx);
     case t.BillingContextTyp.NA:
       return await handleDoctorCall(ctx);
     default:
@@ -25,6 +25,18 @@ export async function findBillingType(
         `Unbekannter Tarif-Context! - angegeben: "${billingContext}"`
       );
   }
+}
+
+async function handleNF(ctx: PromptContext): BillingTypeReturn {
+  if (
+    (await ctx.prompts.dispositionsSchlagwort()) === t.AlarmReason.ITW &&
+    (await ctx.prompts.welchesEingesetzteFahrzeug()) === t.VehicleKind.ITW
+  ) {
+    return handleVerlegung(ctx, t.BillingContextTyp.NF);
+  }
+
+  // TODO: Implement the rest of these cases...
+  return [t.BillingTariff.KTP_KHS, t.BillingType.BG];
 }
 
 async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {

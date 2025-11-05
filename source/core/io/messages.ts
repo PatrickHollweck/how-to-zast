@@ -24,7 +24,35 @@ Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung st
   public async keinTransportmittel() {
     await this.io.message(
       t.Error,
-      "Abrechnung unmöglich! Ihr gewähltes Fahrzeug ist kein zugelassenes Transportmittel und kann somit keinen Transport abrechnen! Wählen sie ein anderes Einsatzmittel"
+      `Abrechnung unmöglich! Ihr gewähltes Fahrzeug ist kein zugelassenes Transportmittel und kann somit keinen Transport abrechnen! NEF und VEF sind **keine** Transportmittel! Es wurde wahrscheinlich nur ein Arzt zur Einsatzstelle verbracht...?!`
+    );
+  }
+
+  public async nefZuVefVerlegung() {
+    await this.io.message(
+      t.Error,
+      "Ein NEF / NAW kann nicht zu einer VEF-Verlegung alarmiert werden! In diesem Fall handelt es sich um einen Notarzteinsatz!"
+    );
+  }
+
+  public async nawOhneArzt() {
+    await this.io.message(
+      t.Error,
+      "Ein NAW kann nicht ohne Arzt transportieren!"
+    );
+  }
+
+  public async dispositionVonNichtITWZuITWEinsatz() {
+    await this.io.message(
+      t.Error,
+      "Dieses Fahrzeug kann nicht zu einem ITW Einsatz alarmiert werden!"
+    );
+  }
+
+  public async transportBeiVersorgungDurchNAW() {
+    await this.io.message(
+      t.Info,
+      "In diesem Fall, kann das Transportfahrzeug nur einen Krankentransport abrechnen. Das Notarztbesetzte Transportmittel (NAW, ITW) muss eine NAV schreiben!"
     );
   }
 
@@ -32,6 +60,13 @@ Abrechnung **AUSSCHLIEßLICH** als KTP-Notfall, falls kein RTW zur Verfügung st
     await this.io.message(
       t.Warning,
       "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, kann nicht als Notarzteinsatz abgerechnet werden!"
+    );
+  }
+
+  public async vefToITWCall() {
+    await this.io.message(
+      t.Error,
+      "Ein VEF kann nicht zu einem ITW Einsatz disponiert werden! Dieser Einsatz ist so nicht möglich."
     );
   }
 

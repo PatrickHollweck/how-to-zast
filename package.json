@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "start:console": "tsx ./source/targets/console/main.ts",
-    "build:web": "parcel source/targets/web/index.html"
+    "build:web": "parcel source/targets/web/index.html",
+    "build:prod": "parcel build source/targets/web/index.html"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.16.0",

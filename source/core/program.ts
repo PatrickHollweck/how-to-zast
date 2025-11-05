@@ -41,13 +41,27 @@ async function handleCallToTransport(ctx: PromptContext) {
 
   const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
 
-  if (
-    doctorInvolvement &&
-    (await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport()) > 0
-  ) {
-    await ctx.messages.notarztNichtAbrechnungsfähig();
+  if (doctorInvolvement) {
+    const isDoctorBillable =
+      await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport();
 
-    return handleNonDoctorTransport(ctx);
+    switch (isDoctorBillable) {
+      case t.DoctorNotBillableReason.KeinGrund:
+        break;
+      case t.DoctorNotBillableReason.NAW_ITW:
+        return await ctx.io.displayResult(
+          t.TransportType.Verrechenbar,
+          t.CallType.KTP_zum_KH,
+          await findBillingType(ctx, t.BillingContextTyp.KTP_Herabstufung)
+        );
+      case t.DoctorNotBillableReason.NichtImDienst:
+      case t.DoctorNotBillableReason.KeineLeistung:
+      case t.DoctorNotBillableReason.MehrerePatienten:
+      case t.DoctorNotBillableReason.Luftrettungsmittel:
+        await ctx.messages.notarztNichtAbrechnungsfähig();
+
+        return handleNonDoctorTransport(ctx);
+    }
   }
 
   if (doctorInvolvement && transport) {
@@ -154,17 +168,27 @@ async function handleNonTransport(ctx: PromptContext) {
     return await ctx.io.displayResult(t.TransportType.Leerfahrt);
   }
 
-  const otherVehicleTransported =
-    await ctx.prompts.anderesFahrzeugTransportiert();
-
-  if (otherVehicleTransported) {
-    return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
-  }
-
   if (await ctx.prompts.beiEintreffenSichereTodeszeichen()) {
     await ctx.messages.beiEintreffenSichereTodeszeichen();
 
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
+  }
+
+  const otherVehicleTransported =
+    await ctx.prompts.anderesFahrzeugTransportiert();
+
+  if (otherVehicleTransported) {
+    switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
+      case t.VehicleKind.KTW:
+      case t.VehicleKind.RTW:
+      case t.VehicleKind.NEF:
+      case t.VehicleKind.VEF:
+      case t.VehicleKind.Misc:
+        return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
+      case t.VehicleKind.NAW:
+      case t.VehicleKind.ITW:
+        ctx.setCached("warNotarztBeteiligt", true);
+    }
   }
 
   const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
@@ -235,13 +259,6 @@ async function handleTransportWithDoctorInvolvement(ctx: PromptContext) {
 }
 
 async function handleDoctorTransportToCallSite(ctx: PromptContext) {
-  const transport = await ctx.prompts.wurdePatientTransportiert();
-
-  // Beispiel: NAW Transport...
-  if (transport) {
-    return handleCallToTransport(ctx);
-  }
-
   const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
 
   switch (currentVehicle) {
@@ -262,5 +279,8 @@ async function handleDoctorTransportToCallSite(ctx: PromptContext) {
         case t.AlarmReason.Verlegungsarzt:
           return await ctx.io.displayResult(t.TransportType.VEF_Einsatz);
       }
+    case t.VehicleKind.ITW:
+    case t.VehicleKind.NAW:
+      return handleNonTransport(ctx);
   }
 }

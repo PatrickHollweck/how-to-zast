@@ -135,8 +135,8 @@ export class Prompts {
 
   public abrechnungsfähigkeitNotarzt_KeinTransport() {
     return this.io.selectBool(
-      "Wäre eine reine Hilfeleistung durch den Rettungsdienst (ohne Notarzt...) ausreichend gewesen?",
-      "Zur Orientierung: Hätte eine Nachforderung durch den Rettungsdienst stattgefunden, wenn der Notarzt nicht eh schon alarmiert gewesen wäre?"
+      "Wäre eine reine Hilfeleistung durch den Rettungsdienst *ohne Notarzt* ausreichend gewesen?",
+      "Entscheidungshilfe: Hätte eine Nachforderung durch den Rettungsdienst stattgefunden, wenn der Notarzt nicht eh schon alarmiert gewesen wäre?"
     );
   }
 
@@ -154,46 +154,52 @@ export class Prompts {
         {
           name: "...stammt von einem **Luftrettungsmittel**, *und* es war kein bodengebundener Notarzt ebenfalls beteiligt",
           description: "RTH, ITH",
-          value: 1,
+          value: t.DoctorNotBillableReason.Luftrettungsmittel,
         },
         {
           name: "...stammt von einem ITW oder NAW, ihr Fahrzeug übernimmt nur den Transport",
           description:
             "In diesem Fall kann durch das Transportmittel nur ein Krankentransport abgerechnet werden. Das Notarztbesetzte Transportmittel schreibt eine NAV",
-          value: 6,
+          value: t.DoctorNotBillableReason.NAW_ITW,
         },
         {
           name: "...hat **mehrere Patienten** an dieser Einsatzstelle versorgt, für **meinen Patienten wäre jedoch keine Notarztalarmierung erfolgt**, wenn kein Notarzt vor Ort gewesen wäre",
           description:
             "Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn hier in der Theorie eine erneute Notarztalarmierung über die ILS erfolgt wäre.",
-          value: 6,
+          value: t.DoctorNotBillableReason.MehrerePatienten,
         },
         {
           name: "...ist zum Einsatzzeitpunkt **nicht** an einem **bayerischen Notarztstandort** aktiv eingesetzt",
           description:
             "Notärzte die nicht in Bayern tätig sind können nicht an der Abrechnung teilnehmen. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
-          value: 2,
+          value: t.DoctorNotBillableReason.NichtImDienst,
         },
         {
           name: "...wurde **garnicht** oder **erst nachträglich** durch Meldung der KVB an die ILS in Dienst versetzt",
           description:
             "Ausschließlich die zuständige ILS kann einen Notarzt in seiner Rolle in Dienst versetzen. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
-          value: 3,
+          value: t.DoctorNotBillableReason.NichtImDienst,
         },
         {
           name: "...hat **keine** abrechnungsfähig ärztliche Leistung vollbracht",
           description:
             "Ärztliche Maßnahmen: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung (Therapie). Trifft nur äußerst selten zu, da bereits eine einfache Anamnese eine verrechenbare Leistung ist.",
-          value: 4,
+          value: t.DoctorNotBillableReason.KeineLeistung,
         },
         {
           name: "...ist kein diensthabender Notarzt, sondern ein Klinik-, Hausarzt-, oder ein zufällig anwesender Arzt (egal ob mit oder ohne Notarztqualifikation)",
           description:
             "Ein nicht in Dienst gestellter Arzt nimmt nicht an der Abrechnung teil. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen.",
-          value: 5,
+          value: t.DoctorNotBillableReason.NichtImDienst,
         },
-        { name: "...ist als **Hintergrundnotarzt** tätig geworden", value: 5 },
-        { name: "**Keine Aussage trifft zu**", value: 0 },
+        {
+          name: "...ist als **Hintergrundnotarzt** tätig geworden",
+          value: t.DoctorNotBillableReason.NichtImDienst,
+        },
+        {
+          name: "**Keine Aussage trifft zu**",
+          value: t.DoctorNotBillableReason.KeinGrund,
+        },
       ],
     });
   }
@@ -237,6 +243,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
         { name: "RTW", value: t.VehicleKind.RTW },
         { name: "NEF", value: t.VehicleKind.NEF },
         { name: "VEF", value: t.VehicleKind.NEF },
+        { name: "NAW", value: t.VehicleKind.NAW },
         { name: "ITW", value: t.VehicleKind.ITW },
         {
           name: "Sonstiges Fahrzeug - HvO, SEG-Fahrzeuge, ...",

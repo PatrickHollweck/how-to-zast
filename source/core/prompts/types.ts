@@ -18,6 +18,7 @@ export const enum VehicleKind {
   RTW,
   NEF,
   VEF,
+  NAW,
   ITW,
   Misc,
 }
@@ -45,6 +46,15 @@ export const enum EmergencyScenario_NF_Downgrade {
   ArbeitsOderWegeOderSchulUnfall,
   SonstigerUnfall,
   SonstigerEinsatz,
+}
+
+export const enum DoctorNotBillableReason {
+  KeinGrund,
+  Luftrettungsmittel,
+  NAW_ITW,
+  MehrerePatienten,
+  NichtImDienst,
+  KeineLeistung,
 }
 
 export const enum ProvisionType {

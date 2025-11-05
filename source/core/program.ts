@@ -154,13 +154,13 @@ async function handleCallToTransport(ctx: PromptContext) {
   }
 
   if (doctorInvolvement && transport) {
-    return handleTransportWithDoctorInvolvement(ctx);
+    return await handleTransportWithDoctorInvolvement(ctx);
   }
 
   const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
 
   if (alarmType === t.AlarmReason.Krankentransport && !perceptionAsEmergency) {
-    return handleKrankentransport(ctx);
+    return await handleKrankentransport(ctx);
   }
 
   const transportToHospital =
@@ -172,7 +172,7 @@ async function handleCallToTransport(ctx: PromptContext) {
     currentVehicle === t.VehicleKind.KTW &&
     transportToHospital
   ) {
-    ctx.messages.ktpNotfallHerabstufung();
+    await ctx.messages.ktpNotfallHerabstufung();
 
     return ctx.io.displayResult(
       t.TransportType.Verrechenbar,

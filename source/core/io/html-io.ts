@@ -47,6 +47,7 @@ export class HtmlIO extends PromptIOProvider {
       description?: string | null;
       cardClasses?: string[];
       extraHeaderElements?: HTMLElement[] | null;
+      extraFooterElements?: HTMLElement[] | null;
     }
   ) {
     const container$ = document.createElement("div");
@@ -92,13 +93,27 @@ export class HtmlIO extends PromptIOProvider {
 
     container$.append(bodyContainer$);
 
-    if (options?.description != null) {
-      const description$ = document.createElement("div");
+    if (
+      options?.description != null ||
+      (options?.extraFooterElements?.length ?? 0) > 0
+    ) {
+      const descriptionContainer$ = document.createElement("div");
 
-      description$.classList.add("card-footer", "md2html");
-      description$.innerHTML = await this.md2html(options.description);
+      descriptionContainer$.classList.add("card-footer", "md2html");
 
-      container$.appendChild(description$);
+      if (options?.description) {
+        descriptionContainer$.innerHTML = await this.md2html(
+          options.description
+        );
+      }
+
+      if (options?.extraFooterElements) {
+        for (const element of options.extraFooterElements) {
+          descriptionContainer$.appendChild(element);
+        }
+      }
+
+      container$.appendChild(descriptionContainer$);
     }
 
     this.append(container$);
@@ -170,6 +185,10 @@ export class HtmlIO extends PromptIOProvider {
     this.append(container$);
 
     this.scrollToTargetAdjusted(container$);
+
+    if (type === t.MessageType.Error) {
+      this.appendResultButtons();
+    }
 
     return new Promise((resolve) => {
       confirmButton$.addEventListener("click", () => {
@@ -311,5 +330,29 @@ export class HtmlIO extends PromptIOProvider {
         "Angaben ohne Gewähr. Um eine neue Abfrage zu starten, einfach die Seite neu laden.",
       cardClasses: ["text-bg-primary"],
     });
+
+    this.appendResultButtons();
+  }
+
+  private appendResultButtons() {
+    const container$ = document.createElement("div");
+    container$.classList.add("row", "mt-4", "d-flex", "gap-2", "flex-row");
+
+    const resetButton$ = document.createElement("button");
+    resetButton$.classList.add("btn", "btn-secondary", "w-auto");
+    resetButton$.innerText = "Abfrage Zurücksetzen";
+    resetButton$.addEventListener("click", () => window.location.reload());
+
+    const reportButton$ = document.createElement("button");
+    reportButton$.classList.add("btn", "btn-secondary", "w-auto");
+    reportButton$.innerText = "Fehler melden";
+    reportButton$.addEventListener("click", () =>
+      window.open("mailto:sentry@patrick-hollweck.de")
+    );
+
+    container$.append(resetButton$);
+    container$.append(reportButton$);
+
+    this.append(container$);
   }
 }

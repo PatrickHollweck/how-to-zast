@@ -307,7 +307,8 @@ export class HtmlIO extends PromptIOProvider {
 - Kostenträgertyp: **${tariffType?.[1] ?? "keine Angabe"}**`);
 
     await this.createCard("Einsatzabrechnung", [display$], {
-      description: "Angaben ohne Gewähr",
+      description:
+        "Angaben ohne Gewähr. Um eine neue Abfrage zu starten, einfach die Seite neu laden.",
       cardClasses: ["text-bg-primary"],
     });
   }

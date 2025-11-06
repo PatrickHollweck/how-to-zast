@@ -20,8 +20,8 @@
     "build:prod": "parcel build source/targets/web/index.html"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.16.0",
-    "@parcel/transformer-typescript-tsc": "^2.16.0",
+    "@parcel/transformer-sass": "^2.16.1",
+    "@parcel/transformer-typescript-tsc": "^2.16.1",
     "@popperjs/core": "^2.11.8",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^24.10.0",
@@ -29,7 +29,7 @@
     "bootstrap-icons": "^1.13.1",
     "inquirer": "^12.10.0",
     "marked": "^16.4.1",
-    "parcel": "^2.16.0",
+    "parcel": "^2.16.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }

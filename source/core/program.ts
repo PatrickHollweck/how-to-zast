@@ -36,10 +36,7 @@ async function handleCallToTransport(ctx: PromptContext) {
     return;
   }
 
-  if (
-    (await ctx.prompts.wurdePatientTransportiert()) &&
-    (await ctx.prompts.transportUrsprungOderZielHuLaPla())
-  ) {
+  if (transport && (await ctx.prompts.transportUrsprungOderZielHuLaPla())) {
     return await ctx.io.displayResult(
       t.TransportType.Verrechenbar,
       t.CallType.KTP_Sonstige,
@@ -92,6 +89,9 @@ async function handleNonTransport_DoctorNotBillable(ctx: PromptContext) {
   const doctorNotBillableReason =
     await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport();
 
+  const isKTW =
+    (await ctx.prompts.welchesEingesetzteFahrzeug()) === t.VehicleKind.KTW;
+
   switch (doctorNotBillableReason) {
     case t.DoctorNotBillableReason.KeinGrund:
       break;
@@ -100,6 +100,10 @@ async function handleNonTransport_DoctorNotBillable(ctx: PromptContext) {
     case t.DoctorNotBillableReason.MehrerePatienten:
       await ctx.messages.notarztNichtAbrechnungsfähig();
       ctx.setCached("warNotarztBeteiligt", false);
+
+      if (isKTW) {
+        return handleKtpDowngrade(ctx);
+      }
 
       return await handleTransportWithoutDoctorInvolvementRTW(ctx);
     case t.DoctorNotBillableReason.NichtAusBayern:

@@ -237,6 +237,10 @@ async function handleNonTransport(ctx: PromptContext) {
     return await ctx.io.displayResult(t.TransportType.NichtVerrechenbar);
   }
 
+  if (!(await isValidVehicleCallTypeCombinationsForTransport(ctx))) {
+    return;
+  }
+
   const transferToOtherVehicleType =
     await ctx.prompts.anderesFahrzeugTransportiert();
 
@@ -349,6 +353,7 @@ async function handleAirTransport(ctx: PromptContext): Promise<any> {
         return await handleNonTransport(ctx);
       case t.HeliTransportType.Bodengebunden:
         ctx.setCached("anderesFahrzeugTransportiert", t.TransferType.Keine);
+
         return await handleCallToTransport(ctx);
       case t.HeliTransportType.Luftgebunden:
         ctx.setCached("wahrnehmungAlsNotfall", true);
@@ -449,9 +454,7 @@ async function handleTransportWithDoctorInvolvement(ctx: PromptContext) {
 }
 
 async function handleDoctorTransportToCallSite(ctx: PromptContext) {
-  const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
-
-  switch (currentVehicle) {
+  switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
     case t.VehicleKind.KTW:
     case t.VehicleKind.RTW:
       return await ctx.io.displayResult(t.TransportType.NA_VA_Zubringer);

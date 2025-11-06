@@ -118,7 +118,7 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
   public async disponierterNotfallNichtSoWahrgenommen() {
     await this.io.message(
       t.Warning,
-      `Wird ein als Notfall disponierter Einsatz vor Ort nicht als Notfall wahrgenommen ist eine **herabstufung auf einen Krankentransport verpflichtend!**<hr/>**Eintrag in ZAST-Info Feld: "NOTFALL-ALARMIERUNG" vornehmen**`
+      `Wird ein als Notfall disponierter Einsatz vor Ort nicht als Notfall wahrgenommen, oder erfüllt nicht die Kriterien für die Abrechnung als Notarzteinsatz, ist eine **herabstufung auf einen Krankentransport verpflichtend!**<hr/>**Eintrag in ZAST-Info Feld: "NOTFALL-ALARMIERUNG" vornehmen**`
     );
   }
 
@@ -139,7 +139,7 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
   public async sondereinsätzeNichtVerpflegt() {
     await this.io.message(
       t.Alert,
-      "In diesem Tool sind Sondereinsätze aktuell nicht verpflegt."
+      "In diesem Tool sind Sonderbedarfseinsätze aktuell nicht verpflegt."
     );
   }
 

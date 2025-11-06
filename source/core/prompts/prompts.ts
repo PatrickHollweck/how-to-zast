@@ -35,9 +35,9 @@ export class Prompts {
       description: "*Dein Fahrzeug wurde alarmiert weil...*",
       choices: [
         {
-          name: "Fahrt zu einem Einsatz als Transportmittel",
+          name: "Fahrt zu einem Einsatz **als Transportmittel**",
           description:
-            "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW. Ausschließlich bei Beauftragung durch zuständige ILS",
+            "Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW wird zu KTP, Notfall o.ä alarmiert. Ausschließlich bei Beauftragung durch zuständige ILS",
           value: t.CallScenario.Rettungsfahrt,
         },
         {

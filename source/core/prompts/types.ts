@@ -29,7 +29,6 @@ export const enum CallScenario {
   Werkstattfahrt,
   Gebietsabsicherung,
   ArztZubringer,
-  HuLaPlaÜbernahme,
 }
 
 export const enum EmergencyScenario_NA {
@@ -42,10 +41,23 @@ export const enum EmergencyScenario_NA {
   SonstigerNofall,
 }
 
+export const enum EmergencyScenario_NF {
+  Verkehrsunfall,
+  Verlegung,
+  ArbeitsOderWegeUnfall,
+  Schulunfall,
+  Internistisch,
+  SonstigerUnfall,
+  SonstigerNofall,
+  NeugeborenenHoldienst,
+}
+
 export const enum EmergencyScenario_NF_Downgrade {
   ArbeitsOderWegeOderSchulUnfall,
   SonstigerUnfall,
   SonstigerEinsatz,
+  Holdienst,
+  Verlegung,
 }
 
 export const enum DoctorNotBillableReason {
@@ -54,7 +66,26 @@ export const enum DoctorNotBillableReason {
   NAW_ITW,
   MehrerePatienten,
   NichtImDienst,
+  NichtAusBayern,
   KeineLeistung,
+}
+
+export const enum HeliTransportType {
+  KeinTransport,
+  Bodengebunden,
+  Luftgebunden,
+}
+
+export const enum TransferType {
+  Keine,
+  Luftgebunden,
+  Bodengebunden,
+}
+
+export const enum NewbornTransportRegion {
+  Andere,
+  Landshut,
+  Augsburg,
 }
 
 export const enum ProvisionType {
@@ -66,6 +97,7 @@ export const enum BillingContextTyp {
   KTP,
   KTP_Herabstufung,
   NF,
+  NF_KVB_Verlegungsarzt,
   NA,
 }
 
@@ -136,11 +168,10 @@ export enum CallType {
   NF_Schulunfall = 23,
   NF_Internistisch = 25,
   NF_Sonstiger_Unfall = 26,
-  NF_kein_Transport_Internistisch = 27,
+  NF_kein_Transport_SonstNotfall = 27,
   NF_kein_Transport_Unfall = 28,
   NF_Sonstiger_Nofall = 29,
-  NF_Neugeborenen_Allgemein = 92,
-  NF_Neugeborenen_Augsburg_Landshut = 92,
+  NF_Neugeborenen_Holdienst = 92,
   NF_Verlegung_KVB = 97,
   NF_ITW = 99,
   // NA

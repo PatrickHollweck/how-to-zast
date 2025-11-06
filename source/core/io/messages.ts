@@ -31,10 +31,45 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
     );
   }
 
-  public async nefZuVefVerlegung() {
+  public async dispositionNotarztZuVefVerlegung() {
     await this.io.message(
       t.Error,
       "Ein NEF / NAW kann nicht zu einer VEF-Verlegung alarmiert werden! In diesem Fall handelt es sich um einen Notarzteinsatz!"
+    );
+  }
+
+  public async hinweisNotarztHerkunftAngeben() {
+    await this.io.message(
+      t.Info,
+      `Notarztstandort des eingesetzen Notarzt im ZAST-Info Feld angeben! Beispiel: "Notarzt aus: Ulm, Österreich, ..."`
+    );
+  }
+
+  public async hinweisLuftrettungsmittelNotarztAngeben() {
+    await this.io.message(
+      t.Info,
+      `Als "Anweisender Arzt" muss der **luftgebundene** Arzt angegeben werden! Zusätzlich Eintrag des RTH Rufnamen ins Zast-Info Feld`
+    );
+  }
+
+  public async hinweisBodengebundenenNotarztAngeben() {
+    await this.io.message(
+      t.Info,
+      `Als "Anweisender Arzt" muss der **bodengebundene** Arzt angegeben werden!`
+    );
+  }
+
+  public async hinweisEintragungAbrechnungsdatenBG() {
+    await this.io.message(
+      t.Info,
+      "Name und Anschrift des Arbeitgeber (bzw. Schule) in ZAST-Info Feld oder auf Transportschein notieren!"
+    );
+  }
+
+  public async hinweiseUnbekannterKTR() {
+    await this.io.message(
+      t.Info,
+      "In diesem Fall muss eine Privatrechnung ausgestellt werden. Der Patient kann diese nach Klärung des Trägers einreichen!"
     );
   }
 
@@ -62,7 +97,7 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
   public async disponierterNotarzteinsatzOhneNotarzt() {
     await this.io.message(
       t.Warning,
-      "Ein disponierter Notarzteinsatz, welcher ohne Notarztbeteiligung abgearbeitet wurde, kann nicht als Notarzteinsatz abgerechnet werden!"
+      "Ein disponierter Notarzteinsatz, welcher ohne (bodengebundene und bayerische) Notarztbeteiligung abgearbeitet wurde, kann nicht als Notarzteinsatz abgerechnet werden!"
     );
   }
 
@@ -70,6 +105,13 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
     await this.io.message(
       t.Error,
       "Ein VEF kann nicht zu einem ITW Einsatz disponiert werden! Dieser Einsatz ist so nicht möglich."
+    );
+  }
+
+  public async einsatzNichtVerrechenbarAlsKTW() {
+    await this.io.message(
+      t.Error,
+      "Dieser Einsatz kann mit einem KTW nicht abgerechnet werden!"
     );
   }
 
@@ -123,20 +165,6 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
     await this.io.message(
       t.Error,
       "**Fehler:** Eine Verlegung ohne Transport gibt es nicht... Dieses Einsatzszenario ist so nicht möglich."
-    );
-  }
-
-  public async hinweisEintragungAbrechnungsdatenBG() {
-    await this.io.message(
-      t.Info,
-      "Name und Anschrift des Arbeitgeber (bzw. Schule) in ZAST-Info Feld oder auf Transportschein notieren!"
-    );
-  }
-
-  public async hinweiseUnbekannterKTR() {
-    await this.io.message(
-      t.Info,
-      "In diesem Fall muss eine Privatrechnung ausgestellt werden. Der Patient kann diese nach Klärung des Trägers einreichen!"
     );
   }
 

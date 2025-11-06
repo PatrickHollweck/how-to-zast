@@ -22,13 +22,15 @@ export abstract class PromptIOProvider {
 
   public async selectBool(
     title: string,
-    description?: string
+    description?: string,
+    yesOptionName: string = "Ja",
+    noOptionName: string = "Nein"
   ): Promise<boolean> {
     let args = {
       title,
       choices: [
-        { name: "Ja", value: true },
-        { name: "Nein", value: false },
+        { name: yesOptionName, value: true },
+        { name: noOptionName, value: false },
       ],
     } as any;
 

@@ -64,7 +64,7 @@ export class HtmlIO extends PromptIOProvider {
     const titleDisplay$ = document.createElement("div");
     titleDisplay$.classList.add(
       "card-header",
-      "fs-4",
+      "fs-5",
       "d-flex",
       "px-4",
       "justify-content-between",
@@ -219,7 +219,7 @@ export class HtmlIO extends PromptIOProvider {
           "col",
           "py-2",
           "px-4",
-          "fs-5",
+          "fs-6",
           "rounded-top",
           options.choices.length > 2 ? "text-start" : "text-center"
         );
@@ -317,7 +317,7 @@ export class HtmlIO extends PromptIOProvider {
     tariffType?: [t.BillingTariff, t.BillingType] | null
   ): Promise<void> {
     const display$ = document.createElement("div");
-    display$.classList.add("fs-4");
+    display$.classList.add("fs-5");
 
     display$.innerHTML = await this.md2html(`
 - Transportart: **${transportType}**
@@ -340,7 +340,7 @@ export class HtmlIO extends PromptIOProvider {
 
     const resetButton$ = document.createElement("button");
     resetButton$.classList.add("btn", "btn-secondary", "w-auto");
-    resetButton$.innerText = "Abfrage Zurücksetzen";
+    resetButton$.innerText = "Abfrage zurücksetzen";
     resetButton$.addEventListener("click", () => window.location.reload());
 
     const reportButton$ = document.createElement("button");

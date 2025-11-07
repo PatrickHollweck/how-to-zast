@@ -1,0 +1,21 @@
+{
+	"configurations": [
+		{
+			"type": "node",
+			"name": "jest",
+			"request": "launch",
+			"args": [
+				"--runInBand",
+				"--watchAll=false",
+				"--testNamePattern",
+				"${jest.testNamePattern}",
+				"--runTestsByPath",
+				"${jest.testFile}"
+			],
+			"cwd": "/home/patrick/Documents/code/how-to-zast",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"program": "/home/patrick/Documents/code/how-to-zast/node_modules/.bin/jest"
+		}
+	]
+}

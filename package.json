@@ -1,36 +1,42 @@
 {
-  "name": "how-to-zast",
-  "version": "1.0.0",
-  "description": "A program to help german ems workers with billing choices",
-  "homepage": "https://github.com/PatrickHollweck/how-to-zast#readme",
-  "bugs": {
-    "url": "https://github.com/PatrickHollweck/how-to-zast/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PatrickHollweck/how-to-zast.git"
-  },
-  "license": "MIT",
-  "author": "Patrick Hollweck <patrick-hollweck@gmx.de>",
-  "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "start:console": "tsx ./source/targets/console/main.ts",
-    "build:web": "parcel source/targets/web/index.html",
-    "build:prod": "parcel build source/targets/web/index.html"
-  },
-  "devDependencies": {
-    "@parcel/transformer-sass": "^2.16.1",
-    "@parcel/transformer-typescript-tsc": "^2.16.1",
-    "@popperjs/core": "^2.11.8",
-    "@types/bootstrap": "^5.2.10",
-    "@types/node": "^24.10.0",
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
-    "inquirer": "^12.10.0",
-    "marked": "^16.4.1",
-    "parcel": "^2.16.1",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
-  }
+	"name": "how-to-zast",
+	"version": "1.0.0",
+	"description": "A program to help german ems workers with billing choices",
+	"homepage": "https://github.com/PatrickHollweck/how-to-zast#readme",
+	"bugs": {
+		"url": "https://github.com/PatrickHollweck/how-to-zast/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/PatrickHollweck/how-to-zast.git"
+	},
+	"license": "MIT",
+	"author": "Patrick Hollweck <patrick-hollweck@gmx.de>",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"format": "prettier --write .",
+		"start:console": "tsx ./source/targets/console/main.ts",
+		"build:web": "parcel source/targets/web/index.html",
+		"build:prod": "parcel build source/targets/web/index.html"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.28.5",
+		"@babel/preset-env": "^7.28.5",
+		"@parcel/transformer-sass": "^2.16.1",
+		"@parcel/transformer-typescript-tsc": "^2.16.1",
+		"@popperjs/core": "^2.11.8",
+		"@types/bootstrap": "^5.2.10",
+		"@types/node": "^24.10.0",
+		"babel-jest": "^30.2.0",
+		"bootstrap": "^5.3.8",
+		"bootstrap-icons": "^1.13.1",
+		"inquirer": "^12.10.0",
+		"jest": "^30.2.0",
+		"marked": "^16.4.1",
+		"parcel": "^2.16.1",
+		"prettier": "3.6.2",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3"
+	}
 }

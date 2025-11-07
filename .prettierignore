@@ -1,0 +1,11 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Private docs
+docs/zast
+
+# Build artifacts
+dist
+build-output
+.parcel-cache

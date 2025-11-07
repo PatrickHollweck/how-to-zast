@@ -4,18 +4,18 @@ import { PromptContext } from "../../core/prompts/context.js";
 import { MessageType } from "../../core/prompts/types.js";
 
 async function main() {
-  const ctx = new PromptContext(new HtmlIO());
+	const ctx = new PromptContext(new HtmlIO());
 
-  try {
-    await startPrompt(ctx);
-  } catch (error: unknown) {
-    console.error(error);
+	try {
+		await startPrompt(ctx);
+	} catch (error: unknown) {
+		console.error(error);
 
-    ctx.io.message(
-      MessageType.Error,
-      `Es ist ein Software-Fehler aufgetreten! Bitte melden!<hr/>${error}`
-    );
-  }
+		ctx.io.message(
+			MessageType.Error,
+			`Es ist ein Software-Fehler aufgetreten! Bitte melden!<hr/>${error}`,
+		);
+	}
 }
 
 main();

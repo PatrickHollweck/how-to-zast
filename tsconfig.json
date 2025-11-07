@@ -1,28 +1,28 @@
 {
-  "compilerOptions": {
-    "rootDir": "./",
-    "outDir": "build-output",
+	"compilerOptions": {
+		"rootDir": "./",
+		"outDir": "build-output",
 
-    "module": "nodenext",
-    "target": "esnext",
-    "lib": ["esnext", "DOM"],
-    "types": ["node"],
+		"module": "nodenext",
+		"target": "esnext",
+		"lib": ["esnext", "DOM"],
+		"types": ["node"],
 
-    "noUnusedLocals": true,
-    "noImplicitReturns": true,
-    "noImplicitOverride": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": false,
-    "noPropertyAccessFromIndexSignature": true,
+		"noUnusedLocals": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": false,
+		"noPropertyAccessFromIndexSignature": true,
 
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
 
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
-    "noUncheckedSideEffectImports": true
-  }
+		"skipLibCheck": true,
+		"isolatedModules": true,
+		"moduleDetection": "force",
+		"verbatimModuleSyntax": true,
+		"noUncheckedSideEffectImports": true
+	}
 }

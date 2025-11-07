@@ -1,127 +1,17 @@
 import "bootstrap";
 
 import { marked } from "marked";
-import { PromptIOProvider } from "./io-provider.js";
+import { PromptIOProvider, type SelectOptions } from "./io-provider.js";
 
 import * as t from "../prompts/types.js";
 
 export class HtmlIO extends PromptIOProvider {
 	private isFirstScroll = true;
 
-	private append(element: HTMLElement) {
-		const renderArea = document.getElementById("render-area");
-
-		if (renderArea == null) {
-			throw new Error("Could not find #render-area");
-		}
-
-		renderArea.insertAdjacentElement("beforeend", element);
-	}
-
-	private async md2html(text: string) {
-		return `<div class="md2html">${await marked.parse(text.trim(), {
-			gfm: true,
-		})}</div>`;
-	}
-
-	private scrollToTargetAdjusted(element: HTMLElement, offset = 100) {
-		if (this.isFirstScroll) {
-			this.isFirstScroll = false;
-			return;
-		}
-
-		const elementPosition = element.getBoundingClientRect().top;
-		const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-		window.scrollTo({
-			top: offsetPosition <= 0 ? 0 : offsetPosition,
-			behavior: "smooth",
-		});
-	}
-
-	private async createCard(
-		title: string,
-		content: HTMLElement[],
-		options?: {
-			description?: string | null;
-			cardClasses?: string[];
-			extraHeaderElements?: HTMLElement[] | null;
-			extraFooterElements?: HTMLElement[] | null;
-		},
-	) {
-		const container$ = document.createElement("div");
-		container$.classList.add(
-			"card",
-			"row",
-			"mt-4",
-			"mb-2",
-			"border-2",
-			"shadow",
-			...(options?.cardClasses ?? []),
-		);
-
-		const titleDisplay$ = document.createElement("div");
-		titleDisplay$.classList.add(
-			"card-header",
-			"fs-5",
-			"d-flex",
-			"px-4",
-			"justify-content-between",
-			"align-items-center",
-		);
-
-		titleDisplay$.innerHTML = await this.md2html(title);
-
-		for (const extraElement of options?.extraHeaderElements ?? []) {
-			titleDisplay$.appendChild(extraElement);
-		}
-
-		container$.appendChild(titleDisplay$);
-
-		const bodyContainer$ = document.createElement("div");
-		bodyContainer$.classList.add(
-			"card-body",
-			"d-flex",
-			"flex-wrap",
-			content.length >= 4 ? "flex-column" : "flex-row",
-		);
-
-		for (const element of content) {
-			bodyContainer$.append(element);
-		}
-
-		container$.append(bodyContainer$);
-
-		if (
-			options?.description != null ||
-			(options?.extraFooterElements?.length ?? 0) > 0
-		) {
-			const descriptionContainer$ = document.createElement("div");
-
-			descriptionContainer$.classList.add("card-footer", "md2html");
-
-			if (options?.description) {
-				descriptionContainer$.innerHTML = await this.md2html(
-					options.description,
-				);
-			}
-
-			if (options?.extraFooterElements) {
-				for (const element of options.extraFooterElements) {
-					descriptionContainer$.appendChild(element);
-				}
-			}
-
-			container$.appendChild(descriptionContainer$);
-		}
-
-		this.append(container$);
-		this.scrollToTargetAdjusted(container$);
-
-		return container$;
-	}
-
-	async message(type: t.MessageType, ...messages: string[]): Promise<void> {
+	override async message(
+		type: t.MessageType,
+		...messages: string[]
+	): Promise<void> {
 		const container$ = document.createElement("div");
 		container$.setAttribute("role", "alert");
 
@@ -198,11 +88,7 @@ export class HtmlIO extends PromptIOProvider {
 		});
 	}
 
-	async select<T>(options: {
-		title: string;
-		description?: string;
-		choices: { name: string; value: T; description?: string }[];
-	}): Promise<T> {
+	override async select<T>(options: SelectOptions<T>): Promise<T> {
 		const buttons: { option: T; button: HTMLButtonElement }[] = [];
 		const elements: HTMLElement[] = [];
 
@@ -309,7 +195,7 @@ export class HtmlIO extends PromptIOProvider {
 		});
 	}
 
-	async displayError(e: unknown): Promise<void> {
+	override async displayError(e: unknown): Promise<void> {
 		console.error(e);
 
 		if (
@@ -345,6 +231,16 @@ export class HtmlIO extends PromptIOProvider {
 		this.appendResultButtons();
 	}
 
+	private append(element: HTMLElement) {
+		const renderArea = document.getElementById("render-area");
+
+		if (renderArea == null) {
+			throw new Error("Could not find #render-area");
+		}
+
+		renderArea.insertAdjacentElement("beforeend", element);
+	}
+
 	private appendResultButtons() {
 		const container$ = document.createElement("div");
 		container$.classList.add("row", "mt-4", "d-flex", "gap-2", "flex-row");
@@ -367,5 +263,108 @@ export class HtmlIO extends PromptIOProvider {
 		container$.append(reportButton$);
 
 		this.append(container$);
+	}
+
+	private async md2html(text: string) {
+		return `<div class="md2html">${await marked.parse(text.trim(), {
+			gfm: true,
+		})}</div>`;
+	}
+
+	private scrollToTargetAdjusted(element: HTMLElement, offset = 100) {
+		if (this.isFirstScroll) {
+			this.isFirstScroll = false;
+			return;
+		}
+
+		const elementPosition = element.getBoundingClientRect().top;
+		const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+		window.scrollTo({
+			top: offsetPosition <= 0 ? 0 : offsetPosition,
+			behavior: "smooth",
+		});
+	}
+
+	private async createCard(
+		title: string,
+		content: HTMLElement[],
+		options?: {
+			description?: string | null;
+			cardClasses?: string[];
+			extraHeaderElements?: HTMLElement[] | null;
+			extraFooterElements?: HTMLElement[] | null;
+		},
+	) {
+		const container$ = document.createElement("div");
+		container$.classList.add(
+			"card",
+			"row",
+			"mt-4",
+			"mb-2",
+			"border-2",
+			"shadow",
+			...(options?.cardClasses ?? []),
+		);
+
+		const titleDisplay$ = document.createElement("div");
+		titleDisplay$.classList.add(
+			"card-header",
+			"fs-5",
+			"d-flex",
+			"px-4",
+			"justify-content-between",
+			"align-items-center",
+		);
+
+		titleDisplay$.innerHTML = await this.md2html(title);
+
+		for (const extraElement of options?.extraHeaderElements ?? []) {
+			titleDisplay$.appendChild(extraElement);
+		}
+
+		container$.appendChild(titleDisplay$);
+
+		const bodyContainer$ = document.createElement("div");
+		bodyContainer$.classList.add(
+			"card-body",
+			"d-flex",
+			"flex-wrap",
+			content.length >= 4 ? "flex-column" : "flex-row",
+		);
+
+		for (const element of content) {
+			bodyContainer$.append(element);
+		}
+
+		container$.append(bodyContainer$);
+
+		if (
+			options?.description != null ||
+			(options?.extraFooterElements?.length ?? 0) > 0
+		) {
+			const descriptionContainer$ = document.createElement("div");
+
+			descriptionContainer$.classList.add("card-footer", "md2html");
+
+			if (options?.description) {
+				descriptionContainer$.innerHTML = await this.md2html(
+					options.description,
+				);
+			}
+
+			if (options?.extraFooterElements) {
+				for (const element of options.extraFooterElements) {
+					descriptionContainer$.appendChild(element);
+				}
+			}
+
+			container$.appendChild(descriptionContainer$);
+		}
+
+		this.append(container$);
+		this.scrollToTargetAdjusted(container$);
+
+		return container$;
 	}
 }

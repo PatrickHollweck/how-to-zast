@@ -1,5 +1,5 @@
 import { select } from "@inquirer/prompts";
-import { PromptIOProvider } from "./io-provider.js";
+import { PromptIOProvider, type SelectOptions } from "./io-provider.js";
 
 import * as t from "../prompts/types.js";
 
@@ -14,7 +14,7 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	message(type: t.MessageType, ...messages: string[]): Promise<void> {
+	override message(type: t.MessageType, ...messages: string[]): Promise<void> {
 		console.log(type, ...messages);
 
 		return new Promise(() => {
@@ -22,11 +22,7 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	async select<T>(options: {
-		title: string;
-		description?: string;
-		choices: { name: string; value: T; description?: string }[];
-	}): Promise<T> {
+	override async select<T>(options: SelectOptions<T>): Promise<T> {
 		if (options.description != null) {
 			await this.message(t.MessageType.Info, options.description);
 		}
@@ -37,7 +33,7 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	displayError(e: unknown): Promise<void> {
+	override displayError(e: unknown): Promise<void> {
 		console.log("Es ist zu einem Fehler gekommen:", e);
 
 		return new Promise(() => {
@@ -45,7 +41,7 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	async displayResult(
+	override async displayResult(
 		transportType: t.TransportType,
 		callType?: t.CallType | null,
 		tariff?: [t.BillingTariff, t.BillingType] | null,

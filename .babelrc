@@ -1,1 +1,4 @@
-{}
+{
+	"sourceType": "module",
+	"presets": ["@babel/preset-typescript"]
+}

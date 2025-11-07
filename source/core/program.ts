@@ -35,6 +35,7 @@ export async function startPrompt(ctx: PromptContext) {
 		}
 	}
 }
+
 async function handleCallToTransport(ctx: PromptContext) {
 	const transport = await ctx.prompts.wurdePatientTransportiert();
 

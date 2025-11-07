@@ -1,6 +1,6 @@
 import type * as t from "../prompts/types.js";
 
-interface SelectOptions<T> {
+export interface SelectOptions<T> {
 	title: string;
 	description?: string;
 	choices: { name: string; value: T; description?: string }[];

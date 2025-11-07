@@ -6,7 +6,7 @@
 		"module": "nodenext",
 		"target": "esnext",
 		"lib": ["esnext", "DOM"],
-		"types": ["node"],
+		"types": ["node", "jest"],
 
 		"noUnusedLocals": true,
 		"noImplicitReturns": true,

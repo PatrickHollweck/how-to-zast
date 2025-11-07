@@ -155,7 +155,7 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 			t.Info,
 			`
 **Zu beachten:**
-1. Als Transportweg ist von \"Notarztversorgung\" nach \"Patienten- oder Behandlungsadresse\" anzugeben
+1. Als Transportweg ist von "Notarztversorgung" nach "Patienten- oder Behandlungsadresse" anzugeben
 2. Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn im Regelfall eine erneute Notarztalarmierung über die ILS erfolgt wäre
 3. Bei einem MANV ist die Abrechnungen mit der ZAST GmbH direkt zu klären!`,
 		);

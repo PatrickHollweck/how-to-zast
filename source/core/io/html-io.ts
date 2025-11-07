@@ -6,17 +6,16 @@ import { PromptIOProvider } from "./io-provider.js";
 import * as t from "../prompts/types.js";
 
 export class HtmlIO extends PromptIOProvider {
-	private renderArea: HTMLElement;
-	private isFirstScroll: boolean = true;
-
-	constructor() {
-		super();
-
-		this.renderArea = document.getElementById("render-area")!;
-	}
+	private isFirstScroll = true;
 
 	private append(element: HTMLElement) {
-		this.renderArea.insertAdjacentElement("beforeend", element);
+		const renderArea = document.getElementById("render-area");
+
+		if (renderArea == null) {
+			throw new Error("Could not find #render-area");
+		}
+
+		renderArea.insertAdjacentElement("beforeend", element);
 	}
 
 	private async md2html(text: string) {
@@ -25,14 +24,14 @@ export class HtmlIO extends PromptIOProvider {
 		})}</div>`;
 	}
 
-	private scrollToTargetAdjusted(element: HTMLElement, offset: number = 100) {
+	private scrollToTargetAdjusted(element: HTMLElement, offset = 100) {
 		if (this.isFirstScroll) {
 			this.isFirstScroll = false;
 			return;
 		}
 
-		var elementPosition = element.getBoundingClientRect().top;
-		var offsetPosition = elementPosition + window.pageYOffset - offset;
+		const elementPosition = element.getBoundingClientRect().top;
+		const offsetPosition = elementPosition + window.pageYOffset - offset;
 
 		window.scrollTo({
 			top: offsetPosition <= 0 ? 0 : offsetPosition,
@@ -122,7 +121,7 @@ export class HtmlIO extends PromptIOProvider {
 		return container$;
 	}
 
-	async message(type: t.MessageType, ...messages: any[]): Promise<void> {
+	async message(type: t.MessageType, ...messages: string[]): Promise<void> {
 		const container$ = document.createElement("div");
 		container$.setAttribute("role", "alert");
 
@@ -199,116 +198,128 @@ export class HtmlIO extends PromptIOProvider {
 		});
 	}
 
-	select<T>(options: {
+	async select<T>(options: {
 		title: string;
 		description?: string;
 		choices: { name: string; value: T; description?: string }[];
 	}): Promise<T> {
-		return new Promise(async (resolve) => {
-			let card$: HTMLElement | null = null;
-			const buttons: HTMLButtonElement[] = [];
-			const elements: HTMLElement[] = [];
+		const buttons: { option: T; button: HTMLButtonElement }[] = [];
+		const elements: HTMLElement[] = [];
 
-			for (const option of options.choices) {
-				const button$ = document.createElement("button");
-				button$.innerHTML = await this.md2html(option.name);
+		for (const option of options.choices) {
+			const button$ = document.createElement("button");
+			button$.innerHTML = await this.md2html(option.name);
 
-				button$.classList.add(
-					"btn",
-					"btn-primary",
-					"col",
-					"py-2",
-					"px-4",
-					"fs-6",
-					"rounded-top",
-					options.choices.length > 2 ? "text-start" : "text-center",
-				);
-
-				button$.addEventListener("click", () => {
-					for (const button of buttons) {
-						button.classList.add("btn-secondary");
-						button.disabled = true;
-					}
-
-					card$?.classList.remove("border-primary");
-					button$.classList.add("btn-success");
-
-					resolve(option.value);
-				});
-
-				buttons.push(button$);
-
-				const container$ = document.createElement("div");
-				container$.classList.add("mx-2", "my-2", "flex-grow-1");
-				container$.append(button$);
-
-				if (option.description?.trim() != null) {
-					container$.classList.add(
-						"d-flex",
-						"flex-column",
-						"bg-primary-subtle",
-						"rounded-bottom",
-					);
-
-					const description$ = document.createElement("span");
-					description$.innerHTML = await this.md2html(option.description);
-
-					description$.classList.add(
-						"option-description",
-						"border",
-						"border-top-0",
-						"border-primary-subtle",
-						"border-3",
-						"md2html",
-						"p-2",
-						"d-none",
-					);
-
-					container$.append(description$);
-				} else {
-					container$.classList.add("d-flex");
-				}
-
-				elements.push(container$);
-			}
-
-			const explainButton$ = document.createElement("button");
-			explainButton$.innerHTML = "<b>?</b>";
-			explainButton$.classList.add(
+			button$.classList.add(
 				"btn",
-				"btn-sm",
-				"btn-dark",
-				"rounded-xl",
-				"justify-self-end",
-				"align-self-centert",
+				"btn-primary",
+				"col",
+				"py-2",
+				"px-4",
+				"fs-6",
+				"rounded-top",
+				options.choices.length > 2 ? "text-start" : "text-center",
 			);
 
-			explainButton$.addEventListener("click", () => {
-				for (const button$ of buttons) {
-					button$.parentElement
-						?.querySelector(".option-description")
-						?.classList.toggle("d-none");
-
-					button$.parentElement?.classList.toggle("rounded-bottom");
-					button$.style.setProperty("--bs-btn-border-radius", "0");
-				}
+			buttons.push({
+				button: button$,
+				option: option.value,
 			});
 
-			card$ = await this.createCard(options.title, elements, {
-				description: options.description ?? null,
-				cardClasses: ["border-primary"],
-				extraHeaderElements: options.choices.some(
-					(option) => option.description != null,
-				)
-					? [explainButton$]
-					: null,
-			});
+			const container$ = document.createElement("div");
+			container$.classList.add("mx-2", "my-2", "flex-grow-1");
+			container$.append(button$);
+
+			if (option.description?.trim() != null) {
+				container$.classList.add(
+					"d-flex",
+					"flex-column",
+					"bg-primary-subtle",
+					"rounded-bottom",
+				);
+
+				const description$ = document.createElement("span");
+				description$.innerHTML = await this.md2html(option.description);
+
+				description$.classList.add(
+					"option-description",
+					"border",
+					"border-top-0",
+					"border-primary-subtle",
+					"border-3",
+					"md2html",
+					"p-2",
+					"d-none",
+				);
+
+				container$.append(description$);
+			} else {
+				container$.classList.add("d-flex");
+			}
+
+			elements.push(container$);
+		}
+
+		const explainButton$ = document.createElement("button");
+		explainButton$.innerHTML = "<b>?</b>";
+		explainButton$.classList.add(
+			"btn",
+			"btn-sm",
+			"btn-dark",
+			"rounded-xl",
+			"justify-self-end",
+			"align-self-centert",
+		);
+
+		explainButton$.addEventListener("click", () => {
+			for (const { button: button$ } of buttons) {
+				button$.parentElement
+					?.querySelector(".option-description")
+					?.classList.toggle("d-none");
+
+				button$.parentElement?.classList.toggle("rounded-bottom");
+				button$.style.setProperty("--bs-btn-border-radius", "0");
+			}
+		});
+
+		const card$ = await this.createCard(options.title, elements, {
+			description: options.description ?? null,
+			cardClasses: ["border-primary"],
+			extraHeaderElements: options.choices.some(
+				(option) => option.description != null,
+			)
+				? [explainButton$]
+				: null,
+		});
+
+		return new Promise((resolve) => {
+			for (const { button: button$, option } of buttons) {
+				button$.addEventListener("click", () => {
+					for (const { button: innerButton } of buttons) {
+						innerButton.classList.add("btn-secondary");
+						innerButton.disabled = true;
+					}
+
+					card$.classList.remove("border-primary");
+					button$.classList.add("btn-success");
+
+					resolve(option);
+				});
+			}
 		});
 	}
 
 	async displayError(e: unknown): Promise<void> {
-		console.log(e);
-		throw new Error("Method not implemented.");
+		console.error(e);
+
+		if (
+			typeof e === "object" &&
+			e != null &&
+			typeof e.toString === "function"
+		) {
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
+			await this.message(t.MessageType.Error, `Fehler: ${String(e)}`);
+		}
 	}
 
 	async displayResult(
@@ -320,9 +331,9 @@ export class HtmlIO extends PromptIOProvider {
 		display$.classList.add("fs-5");
 
 		display$.innerHTML = await this.md2html(`
-- Transportart: **${transportType}**
-- Einsatzart: **${callType ?? "keine Angabe"}**
-- Tarif: **${tariffType?.[0] ?? "keine Angabe"}**
+- Transportart: **${transportType.toString()}**
+- Einsatzart: **${callType?.toString() ?? "keine Angabe"}**
+- Tarif: **${tariffType?.[0].toString() ?? "keine Angabe"}**
 - Kostenträgertyp: **${tariffType?.[1] ?? "keine Angabe"}**`);
 
 		await this.createCard("Einsatzabrechnung", [display$], {
@@ -341,7 +352,9 @@ export class HtmlIO extends PromptIOProvider {
 		const resetButton$ = document.createElement("button");
 		resetButton$.classList.add("btn", "btn-secondary", "w-auto");
 		resetButton$.innerText = "Abfrage zurücksetzen";
-		resetButton$.addEventListener("click", () => window.location.reload());
+		resetButton$.addEventListener("click", () => {
+			window.location.reload();
+		});
 
 		const reportButton$ = document.createElement("button");
 		reportButton$.classList.add("btn", "btn-secondary", "w-auto");

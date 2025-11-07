@@ -25,10 +25,6 @@ export async function findBillingType(
 			);
 		case t.BillingContextTyp.NA:
 			return await handleDoctorCall(ctx);
-		default:
-			throw new Error(
-				`Unbekannter Tarif-Context! - angegeben: "${billingContext}"`,
-			);
 	}
 }
 
@@ -68,7 +64,7 @@ async function handleNF(ctx: PromptContext): BillingTypeReturn {
 			return handle_BG_SZ_forced(ctx, t.BillingContextTyp.NF);
 		case t.EmergencyScenario_NF.SonstigerNofall:
 			return handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true);
-		case t.EmergencyScenario_NF.NeugeborenenHoldienst:
+		case t.EmergencyScenario_NF.NeugeborenenHoldienst: {
 			const region = await ctx.prompts.holdienstRegion();
 
 			switch (region) {
@@ -85,6 +81,7 @@ async function handleNF(ctx: PromptContext): BillingTypeReturn {
 						(await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true))[1],
 					];
 			}
+		}
 	}
 }
 

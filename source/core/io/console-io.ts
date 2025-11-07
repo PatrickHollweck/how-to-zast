@@ -14,8 +14,12 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	async message(type: t.MessageType, ...messages: any[]): Promise<void> {
+	message(type: t.MessageType, ...messages: string[]): Promise<void> {
 		console.log(type, ...messages);
+
+		return new Promise(() => {
+			/* */
+		});
 	}
 
 	async select<T>(options: {
@@ -33,8 +37,12 @@ export class ConsoleIO extends PromptIOProvider {
 		});
 	}
 
-	async displayError(e: unknown): Promise<void> {
+	displayError(e: unknown): Promise<void> {
 		console.log("Es ist zu einem Fehler gekommen:", e);
+
+		return new Promise(() => {
+			/* */
+		});
 	}
 
 	async displayResult(
@@ -51,14 +59,31 @@ export class ConsoleIO extends PromptIOProvider {
 			await this.message(
 				t.MessageType.Info,
 				"Transportart (TA:)",
-				transportType,
+				transportType.toString(),
 			);
 			return;
 		}
 
-		await this.message(t.MessageType.Info, "Transportart (TA:)", transportType);
-		await this.message(t.MessageType.Info, "Einsatzart (EA):", callType ?? "-");
-		await this.message(t.MessageType.Info, `Tarifziffer: ${tariff?.[0]}`);
-		await this.message(t.MessageType.Info, `Kostenträgertyp: ${tariff?.[1]}`);
+		await this.message(
+			t.MessageType.Info,
+			"Transportart (TA:)",
+			transportType.toString(),
+		);
+
+		await this.message(
+			t.MessageType.Info,
+			"Einsatzart (EA):",
+			callType?.toString() ?? "-",
+		);
+
+		await this.message(
+			t.MessageType.Info,
+			`Tarifziffer: ${tariff?.[0].toString() ?? "-"}`,
+		);
+
+		await this.message(
+			t.MessageType.Info,
+			`Kostenträgertyp: ${tariff?.[1].toString() ?? "-"}`,
+		);
 	}
 }

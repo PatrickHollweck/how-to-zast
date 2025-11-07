@@ -13,7 +13,7 @@ export class PromptContext {
 	public prompts: Prompts;
 	public messages: Messages;
 
-	private cache: Map<string, any>;
+	private cache: Map<string, unknown>;
 
 	constructor(io: PromptIOProvider) {
 		this.io = io;
@@ -23,47 +23,44 @@ export class PromptContext {
 	}
 
 	private memoize(prompts: Prompts) {
-		let that = this;
+		const getCachedValue = (target: Prompts, key: string) => {
+			assertObjectHasKey(target, key);
+
+			if (!this.cache.has(key)) {
+				this.cache.set(key, target[key]());
+			}
+
+			return this.cache.get(key);
+		};
 
 		return new Proxy(prompts, {
 			get(target, key) {
-				if (!(key in target)) {
-					return undefined;
-				}
-
-				return () => {
-					if (!that.cache.has(key.toString())) {
-						assertObjectHasKey(target, key);
-						that.cache.set(key.toString(), target[key]());
-					}
-
-					return that.cache.get(key.toString());
-				};
+				return () => getCachedValue(target, key as string);
 			},
 		});
 	}
 
 	public setCached<
-		K extends PickAssignableKeys<Prompts, () => Promise<any>>,
-		V extends Awaited<ReturnType<this["prompts"][K]>>,
-	>(key: K, value: V) {
-		this.cache.set(key.toString(), value);
+		K extends PickAssignableKeys<Prompts, () => Promise<unknown>>,
+	>(key: K, value: Awaited<ReturnType<this["prompts"][K]>>) {
+		this.cache.set(key, value);
 	}
 
 	public flushCached(key: keyof this["prompts"]) {
 		this.cache.delete(key.toString());
 	}
 
-	public hasCached<K extends PickAssignableKeys<Prompts, () => Promise<any>>>(
-		key: K,
+	public hasCached(
+		key: PickAssignableKeys<Prompts, () => Promise<unknown>>,
 	): boolean {
 		return this.cache.has(key);
 	}
 
 	public getCached<
-		K extends PickAssignableKeys<Prompts, () => Promise<any>>,
-		V extends Awaited<ReturnType<this["prompts"][K]>>,
-	>(key: K): V | null {
-		return this.cache.get(key);
+		K extends PickAssignableKeys<Prompts, () => Promise<unknown>>,
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+		T extends Awaited<ReturnType<this["prompts"][K]>> | null,
+	>(key: K): T {
+		return this.cache.get(key) as T;
 	}
 }

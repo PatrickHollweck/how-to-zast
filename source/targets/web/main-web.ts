@@ -11,11 +11,12 @@ async function main() {
 	} catch (error: unknown) {
 		console.error(error);
 
-		ctx.io.message(
+		await ctx.io.message(
 			MessageType.Error,
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			`Es ist ein Software-Fehler aufgetreten! Bitte melden!<hr/>${error}`,
 		);
 	}
 }
 
-main();
+void main();

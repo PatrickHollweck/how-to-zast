@@ -1,6 +1,9 @@
 # Dependencies
 node_modules
 
+# Private docs
+docs/zast
+
 # Build artifacts
 dist
 build-output

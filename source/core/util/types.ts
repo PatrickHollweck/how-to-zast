@@ -2,7 +2,7 @@ export type PickAssignableKeys<T, U> = {
 	[K in keyof T]: T[K] extends U ? K : never;
 }[keyof T];
 
-export function assertObjHasKey<T extends object>(
+export function assertObjectHasKey<T extends object>(
 	obj: T,
 	key: string | number | symbol,
 ): asserts key is keyof T {
@@ -12,3 +12,7 @@ export function assertObjHasKey<T extends object>(
 		);
 	}
 }
+
+export const EMPTY_PROMISE_FUNCTION = (resolve: VoidFunction) => {
+	resolve();
+};

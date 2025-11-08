@@ -1,5 +1,22 @@
-import { ConsoleIO } from "../../core/io/console-io.js";
-import { startPrompt } from "../../core/program.js";
-import { PromptContext } from "../../core/prompts/context.js";
+import { run } from "../../core/program.js";
+import { PromptContext } from "../../core/context.js";
+import {
+	ConsoleInputProvider,
+	ConsoleOutputProvider,
+} from "../../core/io/impl/console-io.js";
+import { IOProvider } from "../../core/io/io-provider.js";
 
-await startPrompt(new PromptContext(new ConsoleIO()));
+process.on("uncaughtException", (error) => {
+	if (!(error instanceof Error) || error.name !== "ExitPromptError") {
+		throw error;
+	}
+});
+
+const io = new IOProvider(
+	new ConsoleInputProvider(),
+	new ConsoleOutputProvider(),
+);
+
+const ctx = new PromptContext(io);
+
+await run(ctx);

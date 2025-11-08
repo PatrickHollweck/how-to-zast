@@ -1,16 +1,16 @@
 import * as t from "./types.js";
 
-import type { PromptIOProvider } from "../io/io-provider.js";
+import type { IOProvider } from "../io/io-provider.js";
 
 export class Prompts {
-	private io: PromptIOProvider;
+	private io: IOProvider;
 
-	constructor(io: PromptIOProvider) {
+	constructor(io: IOProvider) {
 		this.io = io;
 	}
 
 	public vorhaltung() {
-		return this.io.select({
+		return this.io.in.select({
 			title:
 				"Fand dein Einsatz im Rahmen des Hauptaufgabengebietes nach BayRDG statt?",
 			choices: [
@@ -30,7 +30,7 @@ export class Prompts {
 	}
 
 	public szenario() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Was beschreibt die Hauptaufgabe der Fahrt am besten?",
 			description: "*Dein Fahrzeug wurde alarmiert weil...*",
 			choices: [
@@ -69,7 +69,7 @@ export class Prompts {
 	}
 
 	public transportUrsprungOderZielHuLaPla() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Ist der Einsatz- oder Zielort ein Hubschrauberlandeplatz?",
 			"**Hier geht es ausschließlich um einen festen Hubschrauberlandeplatz eines Klinikums!** Transport von Hubschrauberlandeplatz in Einrichtung **oder** von Einrichtung zum Hubschrauberlandeplatz, dann Übernahme durch RTH / ITH",
 		);
@@ -77,7 +77,7 @@ export class Prompts {
 
 	public herabstufungGrundKTP() {
 		// TODO: Andere KTP Gründe? Also Notfall zum Kathetherwechsel...?!
-		return this.io.select({
+		return this.io.in.select({
 			title: "Wodruch wird dein Einsatz am besten beschrieben?",
 			choices: [
 				{
@@ -107,13 +107,13 @@ export class Prompts {
 	}
 
 	public verlegungBegleitungKVB() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Wurde die Verlegung durch einen diensthabenden **KVB-Verlegungsarzt** begleitet?",
 		);
 	}
 
 	public dispositionsSchlagwort() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Disposition des Einsatzes als...",
 			description:
 				"Was steht als Stichwort im Alarmtext? Hier geht es um das letztendlich durch die Leitstelle gewählte Stichwort",
@@ -136,7 +136,7 @@ export class Prompts {
 				},
 				{
 					name: "VEF Verlegung",
-					value: t.AlarmReason.Verlegungsarzt,
+					value: t.AlarmReason.VEF_Verlegung,
 					description: "typischerweise: #RD#VEF",
 				},
 				{
@@ -149,13 +149,13 @@ export class Prompts {
 	}
 
 	public bodengebundenerNotarzt() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"War ein **bodengebundener** Notarzt **ebenfalls** an der **VERSORGUNG** beteiligt?",
 		);
 	}
 
 	public transportBeiHeliBeteiligung() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Was beschreibt den Transport am besten? **Ein Patient...**",
 			description:
 				"Jeweils bei Transport in Behandlungseinrichtung! Auch Nein, wenn kein Patient angetroffen wurde oder sichere Todeszeichen bei Eintreffen aufweist!",
@@ -177,7 +177,7 @@ export class Prompts {
 	}
 
 	public anderesFahrzeugTransportiert() {
-		return this.io.select({
+		return this.io.in.select({
 			title:
 				"War ein anderes Fahrzeug beteiligt, welches den Transport des Patienten übernommen hat?",
 			description:
@@ -197,14 +197,14 @@ export class Prompts {
 	}
 
 	public async sonstigerNotfallKrankenhausTräger() {
-		return await this.io.selectBool(
+		return await this.io.in.selectBool(
 			"Wurde von einem Krankenhaus abtransportiert *und* gibt es einen triftigen Grund weshalb das Krankenhaus die Kosten für den Transport tragen muss?",
 			"Beispiel: Keine zwingende Begründung für Transport mit Notarzt!",
 		);
 	}
 
 	public async abrechnungsfähigkeitNotarzt_NurRdAusreichend() {
-		return await this.io.selectBool(
+		return await this.io.in.selectBool(
 			"Wäre eine reine Hilfeleistung durch den Rettungsdienst *ohne Notarzt* ausreichend gewesen?",
 			"Entscheidungshilfe: Hätte eine Nachforderung durch den Rettungsdienst stattgefunden, wenn der Notarzt nicht eh schon alarmiert gewesen wäre?",
 		);
@@ -215,14 +215,14 @@ export class Prompts {
 			return t.DoctorNotBillableReason.KeineLeistung;
 		}
 
-		return this.io.select({
+		return this.io.in.select({
 			title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,
 			choices: getAbrechnungsfähigkeitNotarztChoices(true),
 		});
 	}
 
 	public abrechnungsfähigkeitNotarzt_Transport() {
-		return this.io.select({
+		return this.io.in.select({
 			title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,
 			choices: getAbrechnungsfähigkeitNotarztChoices(true),
 		});
@@ -230,7 +230,7 @@ export class Prompts {
 
 	public wahrnehmungAlsNotfall() {
 		// TODO: Hilfestellung in Beschreibung - wie definiert?
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Wahrnehmung des Patientenzustands durch RD-Personal am Einsatzort als Notfall?",
 			`
 **Faustregel**
@@ -251,14 +251,14 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	}
 
 	public wurdePatientTransportiert() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Wurde ein Patient mit **ihrem** Fahrzeug **transportiert**?",
 			`Nur "Ja", bei Transport zu verrechenbarem Zielort. Beispiel: "Nach Hause" fahren bei Notfalleinsatz nicht erlaubt!`,
 		);
 	}
 
 	public welchesEingesetzteFahrzeug() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Auf welchem Fahrzeug bist du eingesetzt?",
 			choices: [
 				{ name: "KTW / N-KTW", value: t.VehicleKind.KTW },
@@ -272,7 +272,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	}
 
 	public warNotarztBeteiligt() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"War ein **diensthabender Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
 			`<span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**</span>
       Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte welche **aktiv** an der Patientenversorgung teilgenommen haben!`,
@@ -282,52 +282,52 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	}
 
 	public wurdePatientAngetroffen() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Wurde ein Patient durch den Rettungsdienst angetroffen?",
 			`Beispiele für "nein": Vorsorgliche Bereitstellung, Kein Patient auffindbar, Dein Fahrzeug wurde durch die ILS abbestellt`,
 		);
 	}
 
 	public beiEintreffenSichereTodeszeichen() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Lagen bei Eintreffen sichere Todeszeichen vor?",
 			`Wenn eine Reanimation stattfand, auch wenn diese erfolglos war (!), muss diese Frage mit Nein beantwortet werden.`,
 		);
 	}
 
 	public istKrankenkasseBekannt() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Ist die Krankenkasse oder Unfallversicherung des Patienten bekannt?",
 		);
 	}
 
 	public verlegungInKrankenhausNiedrigerVersorungsstufe() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Wurde in ein Krankenhaus mit gleicher oder niedrigerer Versorgungsstufe verlegt?",
 			"Beispiel: Bettenmangel im abgebenden Krankenhaus. Auch ja: Bei jedem *anderem* Grund, wenn das abgebende Krankenhaus den Transport zahlen muss!",
 		);
 	}
 
 	public istPrivateOderUnbekannteKrankenkasse() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Ist der Patient privat versichert **oder** die Krankenversicherung unbekannt?",
 		);
 	}
 
 	public istUrsacheBG() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Ist ein Schul-, Arbeits-, Wegeunfall oder eine anerkannte Berufskrankheit ursächlich für den Einsatz?",
 		);
 	}
 
 	public istBerufsgenossenschaftBekannt() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"Ist die zuständige Berufsgenossenschaft bekannt?",
 		);
 	}
 
 	public notfallSzenarioOhneNA() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Was beschreibt deinen Einsatz am besten?",
 			choices: [
 				{
@@ -380,13 +380,13 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	}
 
 	public holdienstBegleitungDurchKlinik() {
-		return this.io.selectBool(
+		return this.io.in.selectBool(
 			"War ein Behandlungsteam des Klinikums beteiligt?",
 		);
 	}
 
 	public holdienstRegion() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "In welcher Region fand der Holdienst statt?",
 			choices: [
 				{ name: "Augsburg", value: t.NewbornTransportRegion.Augsburg },
@@ -397,7 +397,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	}
 
 	public notfallSzenarioMitNA() {
-		return this.io.select({
+		return this.io.in.select({
 			title: "Was beschreibt deinen Einsatz am besten?",
 			description: `
 - Arbeits-, Wege-, und Schulunfälle dürfen **nicht** als als Verkehrsunfall oder "Sonstiger Unfall" abgerechnet werden, wenn ein direkter Zusammenhang zwischen der schulischen oder beruflichen Tätigkeit besteht! Weil diese Einsätze nicht über die Berufsgenossenschaft abgerechnet werden können

@@ -1,12 +1,11 @@
 import * as t from "./prompts/types.js";
-import type { PromptContext } from "./prompts/context.js";
-
-type BillingTypeReturn = Promise<[t.BillingTariff, t.BillingType]>;
+import type { PromptContext } from "./context.js";
+import type { BillingInfo } from "./logic/types.js";
 
 export async function findBillingType(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
-): Promise<[number, t.BillingType] | null> {
+): Promise<BillingInfo> {
 	if (await ctx.prompts.transportUrsprungOderZielHuLaPla()) {
 		return await handle_KTR_SZ(ctx, t.BillingContextTyp.KTP);
 	}
@@ -28,7 +27,7 @@ export async function findBillingType(
 	}
 }
 
-async function handleNF(ctx: PromptContext): BillingTypeReturn {
+async function handleNF(ctx: PromptContext): Promise<BillingInfo> {
 	const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
 
 	if (
@@ -71,15 +70,19 @@ async function handleNF(ctx: PromptContext): BillingTypeReturn {
 				case t.NewbornTransportRegion.Andere:
 					return await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true);
 				case t.NewbornTransportRegion.Landshut:
-					return [
-						t.BillingTariff.NF_NEUGEBORENEN_LANDSHUT,
-						(await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true))[1],
-					];
+					return {
+						tariff: t.BillingTariff.NF_NEUGEBORENEN_LANDSHUT,
+						target: (
+							await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true)
+						).target,
+					};
 				case t.NewbornTransportRegion.Augsburg:
-					return [
-						t.BillingTariff.NF_NEUGEBORENEN_AUGSBURG,
-						(await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true))[1],
-					];
+					return {
+						tariff: t.BillingTariff.NF_NEUGEBORENEN_AUGSBURG,
+						target: (
+							await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NF, true)
+						).target,
+					};
 			}
 		}
 	}
@@ -89,7 +92,7 @@ async function handleKTP(ctx: PromptContext) {
 	return await handle_KTR_SZ(ctx, t.BillingContextTyp.KTP);
 }
 
-async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {
+async function handleKTPHerabstufung(ctx: PromptContext): Promise<BillingInfo> {
 	switch (await ctx.prompts.herabstufungGrundKTP()) {
 		case t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall:
 			ctx.setCached("istUrsacheBG", true);
@@ -113,7 +116,7 @@ async function handleKTPHerabstufung(ctx: PromptContext): BillingTypeReturn {
 	}
 }
 
-async function handleDoctorCall(ctx: PromptContext): BillingTypeReturn {
+async function handleDoctorCall(ctx: PromptContext): Promise<BillingInfo> {
 	switch (await ctx.prompts.notfallSzenarioMitNA()) {
 		case t.EmergencyScenario_NA.Verlegung:
 			return await handle_KHS_KTR_BG_SZ(ctx, t.BillingContextTyp.NA);
@@ -138,28 +141,37 @@ async function handleDoctorCall(ctx: PromptContext): BillingTypeReturn {
 async function handle_KTR_SZ(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
-): BillingTypeReturn {
+): Promise<BillingInfo> {
 	return (await ctx.prompts.istPrivateOderUnbekannteKrankenkasse())
-		? [getSelbstzahlerTarif(billingContext), t.BillingType.SZ]
-		: [getKrankenkasseTarif(billingContext), t.BillingType.KTR];
+		? { tariff: getSelbstzahlerTarif(billingContext), target: t.BillingType.SZ }
+		: {
+				tariff: getKrankenkasseTarif(billingContext),
+				target: t.BillingType.KTR,
+			};
 }
 
 async function handle_BG_SZ(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
-): Promise<[t.BillingTariff, t.BillingType] | null> {
+): Promise<BillingInfo | null> {
 	if (await ctx.prompts.istUrsacheBG()) {
 		await ctx.messages.hinweisEintragungAbrechnungsdatenBG();
 
 		if (await ctx.prompts.istBerufsgenossenschaftBekannt()) {
-			return [getBerufsgenossenschaftTarif(billingContext), t.BillingType.BG];
+			return {
+				tariff: getBerufsgenossenschaftTarif(billingContext),
+				target: t.BillingType.BG,
+			};
 		}
 	}
 
 	if (await ctx.prompts.istPrivateOderUnbekannteKrankenkasse()) {
 		await ctx.messages.hinweiseUnbekannterKTR();
 
-		return [getSelbstzahlerTarif(billingContext), t.BillingType.SZ];
+		return {
+			tariff: getSelbstzahlerTarif(billingContext),
+			target: t.BillingType.SZ,
+		};
 	}
 
 	return null;
@@ -168,7 +180,7 @@ async function handle_BG_SZ(
 async function handle_BG_SZ_forced(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
-): BillingTypeReturn {
+): Promise<BillingInfo> {
 	const isBG = await handle_BG_SZ(ctx, billingContext);
 
 	if (isBG) {
@@ -183,7 +195,7 @@ async function handle_BG_SZ_forced(
 async function handle_BG_KTR_SZ(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
-): BillingTypeReturn {
+): Promise<BillingInfo> {
 	const isBG = await handle_BG_SZ(ctx, billingContext);
 
 	if (isBG) {
@@ -197,7 +209,7 @@ async function handle_KHS_KTR_BG_SZ(
 	ctx: PromptContext,
 	billingContext: t.BillingContextTyp,
 	disallowBG = false,
-): BillingTypeReturn {
+): Promise<BillingInfo> {
 	if (!disallowBG) {
 		const isBG = await handle_BG_SZ(ctx, billingContext);
 
@@ -207,7 +219,10 @@ async function handle_KHS_KTR_BG_SZ(
 	}
 
 	if (await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()) {
-		return [getKrankenhausTarif(billingContext), t.BillingType.KHS];
+		return {
+			tariff: getKrankenhausTarif(billingContext),
+			target: t.BillingType.KHS,
+		};
 	}
 
 	return await handle_KTR_SZ(ctx, billingContext);

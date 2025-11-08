@@ -12,13 +12,13 @@ export async function handleTransportWithDoctorInvolvement(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	const callType = {
-		[t.NotfallTyp.Verlegung]: Einsatzart.NA_Verlegung,
-		[t.NotfallTyp.Schulunfall]: Einsatzart.NA_Schulunfall,
-		[t.NotfallTyp.Internistisch]: Einsatzart.NA_Internistisch,
-		[t.NotfallTyp.Verkehrsunfall]: Einsatzart.NA_Verkehrsunfall,
-		[t.NotfallTyp.SonstigerUnfall]: Einsatzart.NA_Sonstiger_Unfall,
-		[t.NotfallTyp.SonstigerNofall]: Einsatzart.NA_Sonstiger_Notfall,
-		[t.NotfallTyp.ArbeitsOderWegeUnfall]: Einsatzart.NA_Arbeitsunfall,
+		[t.NotarzteinsatzTyp.Verlegung]: Einsatzart.NA_Verlegung,
+		[t.NotarzteinsatzTyp.Schulunfall]: Einsatzart.NA_Schulunfall,
+		[t.NotarzteinsatzTyp.Internistisch]: Einsatzart.NA_Internistisch,
+		[t.NotarzteinsatzTyp.Verkehrsunfall]: Einsatzart.NA_Verkehrsunfall,
+		[t.NotarzteinsatzTyp.SonstigerUnfall]: Einsatzart.NA_Sonstiger_Unfall,
+		[t.NotarzteinsatzTyp.SonstigerNofall]: Einsatzart.NA_Sonstiger_Notfall,
+		[t.NotarzteinsatzTyp.ArbeitsOderWegeUnfall]: Einsatzart.NA_Arbeitsunfall,
 	}[await ctx.prompts.notfallSzenarioMitNA()];
 
 	if (

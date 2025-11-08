@@ -1,7 +1,8 @@
 import * as t from "../source/core/prompts/types.js";
 
 import { runTest } from "./util.js";
-import { Transportart } from "../source/core/logic/einsatzarten.js";
+import { Einsatzart, Transportart } from "../source/core/logic/einsatzarten.js";
+import { Kostenträger, Tarif } from "../source/core/logic/billing/types.js";
 
 test("Arzt-Zubringer mit KTW, RTW = EA 5", async () => {
 	for (const vehicle of [t.Fahrzeug.KTW, t.Fahrzeug.RTW])
@@ -37,17 +38,25 @@ test("Arzt-Zubringer mit VEF = EA 7", async () => {
 	);
 });
 
-// test("Arzt-Zubringer mit NAW, ITW = NAV", async () => {
-// 	for (const vehicle of [t.Fahrzeug.NAW, t.Fahrzeug.ITW])
-// 		await runTest(
-// 			{
-// 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
-// 				szenario: t.Szenario.ArztZubringer,
-// 				welchesEingesetzteFahrzeug: vehicle,
-// 				wurdePatientAngetroffen: true,
-// 				beiEintreffenSichereTodeszeichen: false,
-// 				dispositionsSchlagwort: t.Disposition.Notarzt,
-// 			},
-// 			{ transportType: Transportart.NA_VA_Zubringer },
-// 		);
-// });
+test("Arzt-Zubringer mit NAW, ITW = NAV", async () => {
+	for (const vehicle of [t.Fahrzeug.NAW, t.Fahrzeug.ITW])
+		await runTest(
+			{
+				vorhaltung: t.Vorhaltung.Regelvorhaltung,
+				szenario: t.Szenario.ArztZubringer,
+				welchesEingesetzteFahrzeug: vehicle,
+				wurdePatientAngetroffen: true,
+				beiEintreffenSichereTodeszeichen: false,
+				dispositionsSchlagwort: t.Disposition.Notarzt,
+				anderesFahrzeugTransportiert: t.ÜbergabeTyp.Keine,
+				notfallSzenarioMitNA: t.NotarzteinsatzTyp.Internistisch,
+				transportUrsprungOderZielHuLaPla: false,
+				istPrivateOderUnbekannteKrankenkasse: false,
+			},
+			{
+				transportType: Transportart.Verrechenbar,
+				callType: Einsatzart.NA_kein_Transport_Internistisch,
+				billing: { tariff: Tarif.NA_KTR_BG, target: Kostenträger.KTR },
+			},
+		);
+});

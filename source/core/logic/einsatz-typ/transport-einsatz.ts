@@ -33,6 +33,8 @@ export async function handleCallToTransport(
 		return validationResult;
 	}
 
+	// Bei Transport von oder zu HuLaPla ist eine Arztbeteiligung o.ä irrelevant,
+	// es wird immer nur ein 1/19 abgerechnet
 	if (await ctx.prompts.transportUrsprungOderZielHuLaPla()) {
 		return {
 			transportType: Transportart.Verrechenbar,
@@ -57,6 +59,43 @@ export async function handleCallToTransport(
 
 	const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
 	const alarmType = await ctx.prompts.dispositionsSchlagwort();
+
+	switch (currentVehicle) {
+		case t.Fahrzeug.KTW:
+		case t.Fahrzeug.RTW:
+			if (alarmType === t.Disposition.VEF_Verlegung) {
+				return {
+					transportType: Transportart.Verrechenbar,
+					callType: Einsatzart.NA_Verlegung,
+					billing: await findBillingType(ctx, AbrechnungsContext.NA),
+				};
+			}
+
+			if (
+				alarmType === t.Disposition.Notarzt &&
+				!(await ctx.prompts.warNotarztBeteiligt())
+			) {
+				await ctx.messages.disponierterNotarzteinsatzOhneNotarzt();
+				ctx.setCached("dispositionsSchlagwort", t.Disposition.Notfall);
+
+				return await handleCallToTransport(ctx);
+			}
+
+			break;
+		case t.Fahrzeug.NEF:
+		case t.Fahrzeug.VEF:
+		case t.Fahrzeug.NAW:
+			break;
+		case t.Fahrzeug.ITW:
+			if (alarmType === t.Disposition.ITW) {
+				return {
+					transportType: Transportart.Verrechenbar,
+					callType: Einsatzart.NF_ITW,
+					billing: await findBillingType(ctx, AbrechnungsContext.NF),
+				};
+			}
+	}
+
 	const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
 
 	if (alarmType === t.Disposition.Krankentransport && !perceptionAsEmergency) {

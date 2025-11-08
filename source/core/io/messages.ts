@@ -22,6 +22,9 @@ export class Messages {
 	public readonly NEF_ODER_NAW_ZU_VEF_VERLEGUNG =
 		"Ein NEF / NAW kann nicht zu einer VEF-Verlegung alarmiert werden! In diesem Fall handelt es sich um einen Notarzteinsatz!";
 
+	public readonly VEF_VERLEGUNG_ÜBERGABE_NICHT_MÖGL =
+		"Eine VEF-Verlegung kann nicht abrechnungsfähig an ein anderes Transportmittel übergeben werden! Ihr Fahrzeug kann keinen Transport abrechnen. Das schlussendlich transportierende Rettungsmittel schreibt die VEF-Verlegung.";
+
 	public async ktpNotfallHerabstufung() {
 		await this.io.out.warning(
 			`
@@ -35,10 +38,6 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 **Eintrag in ZAST-Info Feld: "KTP-NOTFALL" vornehmen!**
 `,
 		);
-	}
-
-	public async arztZubringerNAW() {
-		await this.io.out.info("In diesem Szenario wird davon ausgegangen, dass ");
 	}
 
 	public async hinweisNotarztHerkunftAngeben() {

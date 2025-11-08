@@ -13,7 +13,7 @@ export async function handleTransportWithoutDoctorInvolvementRTW(
 ): Promise<ProgramResult> {
 	const callScenario = await ctx.prompts.notfallSzenarioOhneNA();
 
-	if (callScenario === t.NotarztTyp.NeugeborenenHoldienst) {
+	if (callScenario === t.NotfalleinsatzTyp.NeugeborenenHoldienst) {
 		if (await ctx.prompts.holdienstBegleitungDurchKlinik()) {
 			return {
 				transportType: Transportart.Verrechenbar,
@@ -23,7 +23,7 @@ export async function handleTransportWithoutDoctorInvolvementRTW(
 		}
 
 		if (await ctx.prompts.wahrnehmungAlsNotfall()) {
-			ctx.setCached("notfallSzenarioOhneNA", t.NotarztTyp.Verlegung);
+			ctx.setCached("notfallSzenarioOhneNA", t.NotfalleinsatzTyp.Verlegung);
 
 			return await handleTransportWithoutDoctorInvolvementRTW(ctx);
 		} else {
@@ -33,7 +33,7 @@ export async function handleTransportWithoutDoctorInvolvementRTW(
 		}
 	}
 
-	if (callScenario === t.NotarztTyp.Verlegung) {
+	if (callScenario === t.NotfalleinsatzTyp.Verlegung) {
 		const isKvbTransfer = await ctx.prompts.verlegungBegleitungKVB();
 
 		return {
@@ -51,13 +51,13 @@ export async function handleTransportWithoutDoctorInvolvementRTW(
 	}
 
 	const callType = {
-		[t.NotarztTyp.Verkehrsunfall]: Einsatzart.NF_Verkehrsunfall,
-		[t.NotarztTyp.Verlegung]: Einsatzart.NF_Verlegung,
-		[t.NotarztTyp.ArbeitsOderWegeUnfall]: Einsatzart.NF_Arbeitsunfall,
-		[t.NotarztTyp.Schulunfall]: Einsatzart.NF_Schulunfall,
-		[t.NotarztTyp.Internistisch]: Einsatzart.NF_Internistisch,
-		[t.NotarztTyp.SonstigerUnfall]: Einsatzart.NF_Sonstiger_Unfall,
-		[t.NotarztTyp.SonstigerNofall]: Einsatzart.NF_Sonstiger_Nofall,
+		[t.NotfalleinsatzTyp.Verkehrsunfall]: Einsatzart.NF_Verkehrsunfall,
+		[t.NotfalleinsatzTyp.Verlegung]: Einsatzart.NF_Verlegung,
+		[t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall]: Einsatzart.NF_Arbeitsunfall,
+		[t.NotfalleinsatzTyp.Schulunfall]: Einsatzart.NF_Schulunfall,
+		[t.NotfalleinsatzTyp.Internistisch]: Einsatzart.NF_Internistisch,
+		[t.NotfalleinsatzTyp.SonstigerUnfall]: Einsatzart.NF_Sonstiger_Unfall,
+		[t.NotfalleinsatzTyp.SonstigerNofall]: Einsatzart.NF_Sonstiger_Nofall,
 	}[callScenario];
 
 	return {

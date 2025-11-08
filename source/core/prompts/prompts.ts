@@ -331,46 +331,46 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 			choices: [
 				{
 					name: "Arbeitsunfall / Wegeunfall",
-					value: t.NotarztTyp.ArbeitsOderWegeUnfall,
+					value: t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall,
 					description:
 						"Notfalleinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Schulunfall",
-					value: t.NotarztTyp.Schulunfall,
+					value: t.NotfalleinsatzTyp.Schulunfall,
 					description:
 						"Notfalleinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Verkehrsunfall",
-					value: t.NotarztTyp.Verkehrsunfall,
+					value: t.NotfalleinsatzTyp.Verkehrsunfall,
 					description: "Unfall mit Verkehrsfahrzeug jeder Art",
 				},
 				{
 					name: "Verlegung",
-					value: t.NotarztTyp.Verlegung,
+					value: t.NotfalleinsatzTyp.Verlegung,
 					description: "Verlegung von KHS A nach KHS B",
 				},
 				{
 					name: "Internistischer Notfall",
-					value: t.NotarztTyp.Internistisch,
+					value: t.NotfalleinsatzTyp.Internistisch,
 					description: "Jeder Internistische Nofall.",
 				},
 				{
 					name: "Sonstiger Unfall",
-					value: t.NotarztTyp.SonstigerUnfall,
+					value: t.NotfalleinsatzTyp.SonstigerUnfall,
 					description:
 						"Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
 				},
 				{
 					name: "Sonstiger Notfall",
-					value: t.NotarztTyp.SonstigerNofall,
+					value: t.NotfalleinsatzTyp.SonstigerNofall,
 					description:
 						"Notfalleinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
 				},
 				{
 					name: "Neugeborenen Holdienst - Inkubatortransport mit Begleitung eines **Klinik**-Behandlungsteams!",
-					value: t.NotarztTyp.NeugeborenenHoldienst,
+					value: t.NotfalleinsatzTyp.NeugeborenenHoldienst,
 					description:
 						"Abholung des Behandlungsteams und Transport zum anfordernden KHS. Transport des Behandlungsteam und des Neugeborenen in das Kinder-KHS",
 				},
@@ -405,41 +405,41 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 			choices: [
 				{
 					name: "Arbeitsunfall / Wegeunfall",
-					value: t.NotfallTyp.ArbeitsOderWegeUnfall,
+					value: t.NotarzteinsatzTyp.ArbeitsOderWegeUnfall,
 					description:
 						"Notarzteinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Schulunfall",
-					value: t.NotfallTyp.Schulunfall,
+					value: t.NotarzteinsatzTyp.Schulunfall,
 					description:
 						"Notarzteinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Verkehrsunfall",
-					value: t.NotfallTyp.Verkehrsunfall,
+					value: t.NotarzteinsatzTyp.Verkehrsunfall,
 					description: "Unfall mit Verkehrsfahrzeug jeder Art",
 				},
 				{
 					name: "Verlegung",
-					value: t.NotfallTyp.Verlegung,
+					value: t.NotarzteinsatzTyp.Verlegung,
 					description: "Verlegung von KHS A nach KHS B",
 				},
 				{
 					name: "Internistischer Notfall",
-					value: t.NotfallTyp.Internistisch,
+					value: t.NotarzteinsatzTyp.Internistisch,
 					description:
 						"Jeder Internistische Nofall. Auch: Reanimation mit internistischer Ursache",
 				},
 				{
 					name: "Sonstiger Unfall",
-					value: t.NotfallTyp.SonstigerUnfall,
+					value: t.NotarzteinsatzTyp.SonstigerUnfall,
 					description:
 						"Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
 				},
 				{
 					name: "Sonstiger Notfall",
-					value: t.NotfallTyp.SonstigerNofall,
+					value: t.NotarzteinsatzTyp.SonstigerNofall,
 					description:
 						"Notarzteinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
 				},

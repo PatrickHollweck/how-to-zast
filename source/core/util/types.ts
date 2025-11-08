@@ -17,22 +17,15 @@ export const EMPTY_PROMISE_FUNCTION = (resolve: VoidFunction) => {
 	resolve();
 };
 
-export function getStringEnumOptions<TEnum, E extends Record<string, TEnum>>(
-	enumObj: E,
-	excludes?: TEnum[],
-): E[keyof E][] {
+export function getNumberEnumOptions<TEnum>(
+	enumObj: Record<string, TEnum>,
+): Exclude<TEnum, string>[] {
 	return Object.values(enumObj).filter(
-		(v): v is E[keyof E] =>
-			typeof v === "number" || (excludes != null && !excludes.includes(v)),
-	);
-}
-
-export function getNumberEnumOptions<TEnum, E extends Record<string, TEnum>>(
-	enumObj: E,
-	excludes?: TEnum[],
-): E[keyof E][] {
-	return Object.values(enumObj).filter(
-		(v): v is E[keyof E] =>
-			typeof v === "number" || (excludes != null && !excludes.includes(v)),
+		(
+			v,
+		): v is Record<string, Exclude<TEnum, string>>[keyof Record<
+			string,
+			TEnum
+		>] => typeof v === "number",
 	);
 }

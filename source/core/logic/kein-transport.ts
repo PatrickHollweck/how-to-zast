@@ -98,25 +98,25 @@ export async function handleNonTransport(
 	await ctx.messages.hinweiseNAV();
 
 	switch (await ctx.prompts.notfallSzenarioMitNA()) {
-		case t.NotfallTyp.Verkehrsunfall:
-		case t.NotfallTyp.ArbeitsOderWegeUnfall:
-		case t.NotfallTyp.Schulunfall:
-		case t.NotfallTyp.SonstigerUnfall: {
+		case t.NotarzteinsatzTyp.Verkehrsunfall:
+		case t.NotarzteinsatzTyp.ArbeitsOderWegeUnfall:
+		case t.NotarzteinsatzTyp.Schulunfall:
+		case t.NotarzteinsatzTyp.SonstigerUnfall: {
 			return {
 				transportType: Transportart.Verrechenbar,
 				callType: Einsatzart.NA_kein_Transport_Unfall,
 				billing: await findBillingType(ctx, AbrechnungsContext.NA),
 			};
 		}
-		case t.NotfallTyp.Internistisch:
-		case t.NotfallTyp.SonstigerNofall: {
+		case t.NotarzteinsatzTyp.Internistisch:
+		case t.NotarzteinsatzTyp.SonstigerNofall: {
 			return {
 				transportType: Transportart.Verrechenbar,
 				callType: Einsatzart.NA_kein_Transport_Internistisch,
 				billing: await findBillingType(ctx, AbrechnungsContext.NA),
 			};
 		}
-		case t.NotfallTyp.Verlegung:
+		case t.NotarzteinsatzTyp.Verlegung:
 			return { error: ctx.messages.VERLEGUNG_OHNE_TRANSPORT };
 	}
 }
@@ -126,10 +126,10 @@ export async function handleNonTransport_NF(
 	patientTransported = true,
 ): Promise<ProgramResult> {
 	switch (await ctx.prompts.notfallSzenarioOhneNA()) {
-		case t.NotarztTyp.Schulunfall:
-		case t.NotarztTyp.Verkehrsunfall:
-		case t.NotarztTyp.SonstigerUnfall:
-		case t.NotarztTyp.ArbeitsOderWegeUnfall: {
+		case t.NotfalleinsatzTyp.Schulunfall:
+		case t.NotfalleinsatzTyp.Verkehrsunfall:
+		case t.NotfalleinsatzTyp.SonstigerUnfall:
+		case t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall: {
 			return {
 				transportType: Transportart.Verrechenbar,
 				callType: Einsatzart.NF_kein_Transport_Unfall,
@@ -137,8 +137,8 @@ export async function handleNonTransport_NF(
 			};
 		}
 
-		case t.NotarztTyp.Verlegung:
-		case t.NotarztTyp.NeugeborenenHoldienst:
+		case t.NotfalleinsatzTyp.Verlegung:
+		case t.NotfalleinsatzTyp.NeugeborenenHoldienst:
 			if (!patientTransported) {
 				return {
 					error:
@@ -147,8 +147,8 @@ export async function handleNonTransport_NF(
 			}
 
 		// eslint-disable-next-line no-fallthrough
-		case t.NotarztTyp.Internistisch:
-		case t.NotarztTyp.SonstigerNofall: {
+		case t.NotfalleinsatzTyp.Internistisch:
+		case t.NotfalleinsatzTyp.SonstigerNofall: {
 			return {
 				transportType: Transportart.Verrechenbar,
 				callType: Einsatzart.NF_kein_Transport_SonstNotfall,

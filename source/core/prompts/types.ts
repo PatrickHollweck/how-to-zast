@@ -28,7 +28,7 @@ export enum Szenario {
 	ArztZubringer,
 }
 
-export enum NotfallTyp {
+export enum NotarzteinsatzTyp {
 	Verkehrsunfall,
 	Verlegung,
 	ArbeitsOderWegeUnfall,
@@ -38,7 +38,7 @@ export enum NotfallTyp {
 	SonstigerNofall,
 }
 
-export enum NotarztTyp {
+export enum NotfalleinsatzTyp {
 	Verkehrsunfall,
 	Verlegung,
 	ArbeitsOderWegeUnfall,

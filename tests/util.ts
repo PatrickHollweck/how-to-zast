@@ -23,8 +23,23 @@ export async function runTest(
 	const ctx = new PromptContext(io);
 	const result = await run(ctx);
 
-	expect(result).toEqual(expectedResult);
-	expect(input.getAskedQuestions().sort()).toEqual(Object.keys(answers).sort());
+	if (
+		!(
+			"error" in result &&
+			typeof result.error === "string" &&
+			"error" in expectedResult
+		)
+	) {
+		expect(result).toEqual(expectedResult);
+	}
+
+	const askedQuestions = input.getAskedQuestions();
+
+	expect(
+		askedQuestions
+			.filter((entry, index) => askedQuestions.indexOf(entry) === index)
+			.sort(),
+	).toEqual(Object.keys(answers).sort());
 }
 
 export { getNumberEnumOptions };

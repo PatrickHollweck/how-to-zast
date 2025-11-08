@@ -62,18 +62,18 @@ async function handleNotfall(ctx: PromptContext): Promise<BillingInfo> {
 	}
 
 	switch (await ctx.prompts.notfallSzenarioOhneNA()) {
-		case t.NotarztTyp.Verkehrsunfall:
-		case t.NotarztTyp.Internistisch:
-		case t.NotarztTyp.SonstigerUnfall:
+		case t.NotfalleinsatzTyp.Verkehrsunfall:
+		case t.NotfalleinsatzTyp.Internistisch:
+		case t.NotfalleinsatzTyp.SonstigerUnfall:
 			return handle_KTR_SZ(ctx, AbrechnungsContext.NF);
-		case t.NotarztTyp.Verlegung:
+		case t.NotfalleinsatzTyp.Verlegung:
 			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF);
-		case t.NotarztTyp.Schulunfall:
-		case t.NotarztTyp.ArbeitsOderWegeUnfall:
+		case t.NotfalleinsatzTyp.Schulunfall:
+		case t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall:
 			return handle_BG_SZ_forced(ctx, AbrechnungsContext.NF);
-		case t.NotarztTyp.SonstigerNofall:
+		case t.NotfalleinsatzTyp.SonstigerNofall:
 			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF, true);
-		case t.NotarztTyp.NeugeborenenHoldienst: {
+		case t.NotfalleinsatzTyp.NeugeborenenHoldienst: {
 			const region = await ctx.prompts.holdienstRegion();
 
 			switch (region) {
@@ -128,19 +128,19 @@ async function handleKTPHerabstufung(ctx: PromptContext): Promise<BillingInfo> {
 
 async function handleDoctorCall(ctx: PromptContext): Promise<BillingInfo> {
 	switch (await ctx.prompts.notfallSzenarioMitNA()) {
-		case t.NotfallTyp.Verlegung:
+		case t.NotarzteinsatzTyp.Verlegung:
 			return await handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NA);
-		case t.NotfallTyp.Schulunfall:
-		case t.NotfallTyp.ArbeitsOderWegeUnfall:
+		case t.NotarzteinsatzTyp.Schulunfall:
+		case t.NotarzteinsatzTyp.ArbeitsOderWegeUnfall:
 			ctx.setCached("istUrsacheBG", true);
 			return await handle_BG_SZ_forced(ctx, AbrechnungsContext.NA);
 
-		case t.NotfallTyp.SonstigerNofall:
-		case t.NotfallTyp.SonstigerUnfall:
+		case t.NotarzteinsatzTyp.SonstigerNofall:
+		case t.NotarzteinsatzTyp.SonstigerUnfall:
 			return await handle_BG_KTR_SZ(ctx, AbrechnungsContext.NA);
 
-		case t.NotfallTyp.Internistisch:
-		case t.NotfallTyp.Verkehrsunfall:
+		case t.NotarzteinsatzTyp.Internistisch:
+		case t.NotarzteinsatzTyp.Verkehrsunfall:
 			return await handle_KTR_SZ(ctx, AbrechnungsContext.NA);
 
 		default:

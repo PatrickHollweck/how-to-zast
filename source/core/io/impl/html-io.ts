@@ -14,10 +14,10 @@ export class HtmlOutputProvider extends OutputProvider {
 
 		if (result.transportType === Transportart.Verrechenbar) {
 			display$.innerHTML = await md2html(`
-				- Transportart: **${result.transportType.toString()}**
-				- Einsatzart: **${result.callType.toString()}**
-				- Tarif: **${result.billing.tariff.toString()}**
-				- Kostenträgertyp: **${result.billing.target.toString()}**
+- Transportart: **${result.transportType.toString()}**
+- Einsatzart: **${result.callType.toString()}**
+- Tarif: **${result.billing.tariff.toString()}**
+- Kostenträgertyp: **${result.billing.target.toString()}**
 			`);
 		} else {
 			display$.innerHTML = await md2html(

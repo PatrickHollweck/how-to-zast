@@ -37,6 +37,10 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 		);
 	}
 
+	public async arztZubringerNAW() {
+		await this.io.out.info("In diesem Szenario wird davon ausgegangen, dass ");
+	}
+
 	public async hinweisNotarztHerkunftAngeben() {
 		await this.io.out.info(
 			`Notarztstandort des eingesetzen Notarzt im ZAST-Info Feld angeben! Beispiel: "Notarzt aus: Ulm, Österreich, ..."`,

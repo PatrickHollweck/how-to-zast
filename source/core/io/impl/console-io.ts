@@ -1,6 +1,6 @@
 import { select } from "@inquirer/prompts";
 
-import * as t from "../../prompts/types.js";
+import { Transportart } from "../../logic/einsatzarten.js";
 import { EMPTY_PROMISE_FUNCTION } from "../../util/types.js";
 import { MessageType, OutputProvider } from "../output-provider.js";
 import { InputProvider, type SelectOptions } from "../input-provider.js";
@@ -20,7 +20,7 @@ export class ConsoleOutputProvider extends OutputProvider {
 	public override async result(result: ProgramResultNonError): Promise<void> {
 		await this.info("Der Einsatz muss wie folgt abgerechnet werden:");
 
-		if (result.transportType !== t.TransportType.Verrechenbar) {
+		if (result.transportType !== Transportart.Verrechenbar) {
 			await this.info("Transportart (TA:)", result.transportType.toString());
 
 			return;

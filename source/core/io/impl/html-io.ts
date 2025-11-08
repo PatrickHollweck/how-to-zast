@@ -4,7 +4,7 @@ import { marked } from "marked";
 import { MessageType, OutputProvider } from "../output-provider.js";
 import { InputProvider, type SelectOptions } from "../input-provider.js";
 
-import { TransportType } from "../../prompts/types.js";
+import { Transportart } from "../../logic/einsatzarten.js";
 import type { ProgramResultNonError } from "../../logic/types.js";
 
 export class HtmlOutputProvider extends OutputProvider {
@@ -12,7 +12,7 @@ export class HtmlOutputProvider extends OutputProvider {
 		const display$ = document.createElement("div");
 		display$.classList.add("fs-5");
 
-		if (result.transportType === TransportType.Verrechenbar) {
+		if (result.transportType === Transportart.Verrechenbar) {
 			display$.innerHTML = await md2html(`
 				- Transportart: **${result.transportType.toString()}**
 				- Einsatzart: **${result.callType.toString()}**

@@ -16,13 +16,13 @@ export class Prompts {
 			choices: [
 				{
 					name: "**Regelvorhaltung**",
-					value: t.ProvisionType.Regelvorhaltung,
+					value: t.Vorhaltung.Regelvorhaltung,
 					description:
 						"Rettungsmittel die öffentlich-rechtlich regelhaft vorgehalten werden",
 				},
 				{
 					name: "Sonderbedarf",
-					value: t.ProvisionType.Sondereinsatz,
+					value: t.Vorhaltung.Sondereinsatz,
 					description: "z.B: LRD, UGRD, ORGL, ELRD, HvO, SEG-Einsatz",
 				},
 			],
@@ -38,29 +38,29 @@ export class Prompts {
 					name: "Fahrt zu einem Einsatz **als Transportmittel**",
 					description:
 						"Transportmittel nach DIN1789 wie: KTW, N-KTW, RTW wird zu KTP, Notfall o.ä alarmiert. Ausschließlich bei Beauftragung durch zuständige ILS",
-					value: t.CallScenario.Rettungsfahrt,
+					value: t.Szenario.Rettungsfahrt,
 				},
 				{
 					name: "Zubringen eines Arztes",
 					description:
 						"Ein Notarzt oder Verlegungsarzt wurde durch die Leitstelle alarmiert und an die Einstalstelle verbracht.\nTypischerweise: NEF, VEF Einsätze\nAuch zu nutzen wenn NEF oder VEF defekt, besetzt oder anderweitig belegt ist und ein anderes Fahrzeug genutzt wird.",
-					value: t.CallScenario.ArztZubringer,
+					value: t.Szenario.ArztZubringer,
 				},
 				{
 					name: "Fahrt zur Aufrechterhaltung des Dienstbetriebs",
-					value: t.CallScenario.Dienstfahrt,
+					value: t.Szenario.Dienstfahrt,
 					description:
 						"Voraussetzungen:\n1. Durchführung nur auf Anordnung durch KGF oder RDL\n2. Leitstelle muss davon unterrichtet sein und muss innerhalb der Vorhaltezeit diese Fahrt genehmigen\noder: nötige Fahrten zur Personalumsetzung",
 				},
 				{
 					name: "Fahrt von oder zur Werkstatt",
-					value: t.CallScenario.Werkstattfahrt,
+					value: t.Szenario.Werkstattfahrt,
 					description:
 						"Voraussetzung: Direkter Zusammenhang mit Reparatur eines Rettungsdienstfahrzeugs muss vorliegen",
 				},
 				{
 					name: "Fahrt zur Gebietsabsicherung",
-					value: t.CallScenario.Gebietsabsicherung,
+					value: t.Szenario.Gebietsabsicherung,
 					description:
 						"Alarmierung durch zuständige ILS mit: R0540#Gebietsabsicherung\nSicherstellung der Einsatzfähigkeit in einem anderen Rettungsdienstbereich bzw. Einsatzgebiet einer anderen Rettungswache",
 				},
@@ -83,24 +83,23 @@ export class Prompts {
 				{
 					name: "Verlegung",
 					description: "Verlegung von KHS A zu KHS B",
-					value: t.EmergencyScenario_NF_Downgrade.Verlegung,
+					value: t.NotfallTyp_Downgrade.Verlegung,
 				},
 				{
 					name: "Schul-, Wege-, Arbeitsunfall oder ursächlich einer anerkannten Berufskrankheit",
-					value:
-						t.EmergencyScenario_NF_Downgrade.ArbeitsOderWegeOderSchulUnfall,
+					value: t.NotfallTyp_Downgrade.ArbeitsOderWegeOderSchulUnfall,
 				},
 				{
 					name: "Sonstiger Unfall (Traumatisch)",
-					value: t.EmergencyScenario_NF_Downgrade.SonstigerUnfall,
+					value: t.NotfallTyp_Downgrade.SonstigerUnfall,
 				},
 				{
 					name: "Sonstiger Einsatz (Internistisch, Neurologisch, ...)",
-					value: t.EmergencyScenario_NF_Downgrade.SonstigerEinsatz,
+					value: t.NotfallTyp_Downgrade.SonstigerEinsatz,
 				},
 				{
 					name: "Neugeborenen Holdienst - Inkubatortransport mit Begleitung eines **Klinik**-Behandlungsteams!",
-					value: t.EmergencyScenario_NF_Downgrade.Holdienst,
+					value: t.NotfallTyp_Downgrade.Holdienst,
 				},
 			],
 		});
@@ -120,28 +119,28 @@ export class Prompts {
 			choices: [
 				{
 					name: "**Notfall**einsatz - Notfall ohne Notarzt",
-					value: t.AlarmReason.Notfall,
+					value: t.Disposition.Notfall,
 					description: "RD1 - keine planmäßige Alarmierung eines NA",
 				},
 				{
 					name: "**Notarzt**einsatz - Notfall mit Notarzt",
-					value: t.AlarmReason.Notarzt,
+					value: t.Disposition.Notarzt,
 					description:
 						"RD2 oder höher - MIT planmäßiger Beteiligung eines Notarzt",
 				},
 				{
 					name: "Krankentransport",
-					value: t.AlarmReason.Krankentransport,
+					value: t.Disposition.Krankentransport,
 					description: "#RD#KTP#90XX - auch Prio.2 (#9017) Einsätze!",
 				},
 				{
 					name: "VEF Verlegung",
-					value: t.AlarmReason.VEF_Verlegung,
+					value: t.Disposition.VEF_Verlegung,
 					description: "typischerweise: #RD#VEF",
 				},
 				{
 					name: "ITW Einsatz",
-					value: t.AlarmReason.ITW,
+					value: t.Disposition.ITW,
 					description: "Nur bei Verwendung des Stichworts: #RD#ITW durch ILS",
 				},
 			],
@@ -162,15 +161,15 @@ export class Prompts {
 			choices: [
 				{
 					name: "...wurde **nicht** transportiert",
-					value: t.HeliTransportType.KeinTransport,
+					value: t.RthTrnasportTyp.KeinTransport,
 				},
 				{
 					name: "...wurde mit **ihrem** Fahrzeug transportiert",
-					value: t.HeliTransportType.Bodengebunden,
+					value: t.RthTrnasportTyp.Bodengebunden,
 				},
 				{
 					name: "...wurde mit dem **Helikopter** transportiert",
-					value: t.HeliTransportType.Luftgebunden,
+					value: t.RthTrnasportTyp.Luftgebunden,
 				},
 			],
 		});
@@ -185,13 +184,13 @@ export class Prompts {
 			choices: [
 				{
 					name: "Ja, an **Luft**rettungsmittel",
-					value: t.TransferType.Luftgebunden,
+					value: t.ÜbergabeTyp.Luftgebunden,
 				},
 				{
 					name: "Ja, an **Land**rettungsmittel",
-					value: t.TransferType.Bodengebunden,
+					value: t.ÜbergabeTyp.Bodengebunden,
 				},
-				{ name: "Nein", value: t.TransferType.Keine },
+				{ name: "Nein", value: t.ÜbergabeTyp.Keine },
 			],
 		});
 	}
@@ -212,7 +211,7 @@ export class Prompts {
 
 	public async abrechnungsfähigkeitNotarzt_KeinTransport() {
 		if (await this.abrechnungsfähigkeitNotarzt_NurRdAusreichend()) {
-			return t.DoctorNotBillableReason.KeineLeistung;
+			return t.AblehungsgrundNotarzt.KeineLeistung;
 		}
 
 		return this.io.in.select({
@@ -261,12 +260,12 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 		return this.io.in.select({
 			title: "Auf welchem Fahrzeug bist du eingesetzt?",
 			choices: [
-				{ name: "KTW / N-KTW", value: t.VehicleKind.KTW },
-				{ name: "RTW", value: t.VehicleKind.RTW },
-				{ name: "NEF", value: t.VehicleKind.NEF },
-				{ name: "VEF", value: t.VehicleKind.VEF },
-				{ name: "NAW", value: t.VehicleKind.NAW },
-				{ name: "ITW", value: t.VehicleKind.ITW },
+				{ name: "KTW / N-KTW", value: t.Fahrzeug.KTW },
+				{ name: "RTW", value: t.Fahrzeug.RTW },
+				{ name: "NEF", value: t.Fahrzeug.NEF },
+				{ name: "VEF", value: t.Fahrzeug.VEF },
+				{ name: "NAW", value: t.Fahrzeug.NAW },
+				{ name: "ITW", value: t.Fahrzeug.ITW },
 			],
 		});
 	}
@@ -332,46 +331,46 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 			choices: [
 				{
 					name: "Arbeitsunfall / Wegeunfall",
-					value: t.EmergencyScenario_NF.ArbeitsOderWegeUnfall,
+					value: t.NotarztTyp.ArbeitsOderWegeUnfall,
 					description:
 						"Notfalleinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Schulunfall",
-					value: t.EmergencyScenario_NF.Schulunfall,
+					value: t.NotarztTyp.Schulunfall,
 					description:
 						"Notfalleinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Verkehrsunfall",
-					value: t.EmergencyScenario_NF.Verkehrsunfall,
+					value: t.NotarztTyp.Verkehrsunfall,
 					description: "Unfall mit Verkehrsfahrzeug jeder Art",
 				},
 				{
 					name: "Verlegung",
-					value: t.EmergencyScenario_NF.Verlegung,
+					value: t.NotarztTyp.Verlegung,
 					description: "Verlegung von KHS A nach KHS B",
 				},
 				{
 					name: "Internistischer Notfall",
-					value: t.EmergencyScenario_NF.Internistisch,
+					value: t.NotarztTyp.Internistisch,
 					description: "Jeder Internistische Nofall.",
 				},
 				{
 					name: "Sonstiger Unfall",
-					value: t.EmergencyScenario_NF.SonstigerUnfall,
+					value: t.NotarztTyp.SonstigerUnfall,
 					description:
 						"Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
 				},
 				{
 					name: "Sonstiger Notfall",
-					value: t.EmergencyScenario_NF.SonstigerNofall,
+					value: t.NotarztTyp.SonstigerNofall,
 					description:
 						"Notfalleinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
 				},
 				{
 					name: "Neugeborenen Holdienst - Inkubatortransport mit Begleitung eines **Klinik**-Behandlungsteams!",
-					value: t.EmergencyScenario_NF.NeugeborenenHoldienst,
+					value: t.NotarztTyp.NeugeborenenHoldienst,
 					description:
 						"Abholung des Behandlungsteams und Transport zum anfordernden KHS. Transport des Behandlungsteam und des Neugeborenen in das Kinder-KHS",
 				},
@@ -389,9 +388,9 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 		return this.io.in.select({
 			title: "In welcher Region fand der Holdienst statt?",
 			choices: [
-				{ name: "Augsburg", value: t.NewbornTransportRegion.Augsburg },
-				{ name: "Landshut", value: t.NewbornTransportRegion.Landshut },
-				{ name: "*Andere Region*", value: t.NewbornTransportRegion.Andere },
+				{ name: "Augsburg", value: t.HoldienstTyp.Augsburg },
+				{ name: "Landshut", value: t.HoldienstTyp.Landshut },
+				{ name: "*Andere Region*", value: t.HoldienstTyp.Andere },
 			],
 		});
 	}
@@ -406,41 +405,41 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 			choices: [
 				{
 					name: "Arbeitsunfall / Wegeunfall",
-					value: t.EmergencyScenario_NA.ArbeitsOderWegeUnfall,
+					value: t.NotfallTyp.ArbeitsOderWegeUnfall,
 					description:
 						"Notarzteinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Schulunfall",
-					value: t.EmergencyScenario_NA.Schulunfall,
+					value: t.NotfallTyp.Schulunfall,
 					description:
 						"Notarzteinsatz innerhalb des Schulgeländes. Internistische Notfälle fallen nicht unter diese EA!",
 				},
 				{
 					name: "Verkehrsunfall",
-					value: t.EmergencyScenario_NA.Verkehrsunfall,
+					value: t.NotfallTyp.Verkehrsunfall,
 					description: "Unfall mit Verkehrsfahrzeug jeder Art",
 				},
 				{
 					name: "Verlegung",
-					value: t.EmergencyScenario_NA.Verlegung,
+					value: t.NotfallTyp.Verlegung,
 					description: "Verlegung von KHS A nach KHS B",
 				},
 				{
 					name: "Internistischer Notfall",
-					value: t.EmergencyScenario_NA.Internistisch,
+					value: t.NotfallTyp.Internistisch,
 					description:
 						"Jeder Internistische Nofall. Auch: Reanimation mit internistischer Ursache",
 				},
 				{
 					name: "Sonstiger Unfall",
-					value: t.EmergencyScenario_NA.SonstigerUnfall,
+					value: t.NotfallTyp.SonstigerUnfall,
 					description:
 						"Jeder Unfall (bzw. Trauma) welcher nicht von den anderen Unfallarten besser beschrieben ist.\nHaus- und Sportunfälle, welche nicht Schul-, Arbeits- oder Wegeunfälle sind",
 				},
 				{
 					name: "Sonstiger Notfall",
-					value: t.EmergencyScenario_NA.SonstigerNofall,
+					value: t.NotfallTyp.SonstigerNofall,
 					description:
 						"Notarzteinsatz, welcher mit keiner anderen Einsatzart definiert ist.",
 				},
@@ -454,53 +453,53 @@ function getAbrechnungsfähigkeitNotarztChoices(transport: boolean) {
 		{
 			name: "...stammt von einem **Luftrettungsmittel**",
 			description: "RTH, ITH",
-			value: t.DoctorNotBillableReason.Luftrettungsmittel,
+			value: t.AblehungsgrundNotarzt.Luftrettungsmittel,
 		},
 		transport
 			? {
 					name: "...stammt von einem **ITW** oder **NAW**, ihr Fahrzeug übernimmt nur den Transport",
 					description:
 						"In diesem Fall kann durch das Transportmittel nur ein Krankentransport abgerechnet werden. Das Notarztbesetzte Transportmittel schreibt eine NAV",
-					value: t.DoctorNotBillableReason.NAW_ITW,
+					value: t.AblehungsgrundNotarzt.NAW_ITW,
 				}
 			: null,
 		{
 			name: "...hat **mehrere Patienten** an dieser Einsatzstelle versorgt, für **meinen Patienten wäre jedoch keine Notarztalarmierung erfolgt**, wenn kein Notarzt vor Ort gewesen wäre",
 			description:
 				"Zusätzlich am gleichen Einsatz versorgte Patienten können nur abgerechnet werden, wenn hier in der Theorie eine erneute Notarztalarmierung über die ILS erfolgt wäre.",
-			value: t.DoctorNotBillableReason.MehrerePatienten,
+			value: t.AblehungsgrundNotarzt.MehrerePatienten,
 		},
 		{
 			name: "...ist zum Einsatzzeitpunkt **nicht** an einem **bayerischen Notarztstandort** eingesetzt",
 			description:
 				"Notärzte die nicht in Bayern tätig sind können nicht an der Abrechnung teilnehmen. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
-			value: t.DoctorNotBillableReason.NichtAusBayern,
+			value: t.AblehungsgrundNotarzt.NichtAusBayern,
 		},
 		{
 			name: "...wurde **nicht** durch Meldung der KVB an die ILS in Dienst versetzt",
 			description:
 				"Ausschließlich die zuständige ILS kann einen Notarzt in seiner Rolle in Dienst versetzen. Eine nachträgliche Indienstsetzung durch die ILS ist möglich. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen!",
-			value: t.DoctorNotBillableReason.NichtImDienst,
+			value: t.AblehungsgrundNotarzt.NichtImDienst,
 		},
 		{
 			name: "...hat **keine** abrechnungsfähig ärztliche Leistung vollbracht",
 			description:
 				"Ärztliche Maßnahmen: Basisuntersuchung, Anamneseerhebung, Diagnostik, Versorgung (Therapie). Trifft nur äußerst selten zu, da bereits eine einfache Anamnese eine verrechenbare Leistung ist.",
-			value: t.DoctorNotBillableReason.KeineLeistung,
+			value: t.AblehungsgrundNotarzt.KeineLeistung,
 		},
 		{
 			name: "...ist ein **Klinik-, KVB-, Hausarzt-, oder ein zufällig anwesender Arzt** (egal ob mit oder ohne Notarztqualifikation)",
 			description:
 				"Ein nicht in Dienst gestellter Arzt nimmt nicht an der Abrechnung teil. Ein Notarzt kann sich in seiner Rolle nicht selbstständig in Dienst versetzen.",
-			value: t.DoctorNotBillableReason.NichtImDienst,
+			value: t.AblehungsgrundNotarzt.NichtImDienst,
 		},
 		{
 			name: "...ist als **Hintergrundnotarzt** tätig geworden",
-			value: t.DoctorNotBillableReason.NichtImDienst,
+			value: t.AblehungsgrundNotarzt.NichtImDienst,
 		},
 		{
 			name: "**Keine Aussage trifft zu**",
-			value: t.DoctorNotBillableReason.KeinGrund,
+			value: t.AblehungsgrundNotarzt.KeinGrund,
 		},
 	].filter((choice) => choice != null);
 }

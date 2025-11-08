@@ -1,13 +1,9 @@
-import type {
-	CallType,
-	BillingType,
-	TransportType,
-	BillingTariff,
-} from "../prompts/types.js";
+import type { Einsatzart, Transportart } from "./einsatzarten.js";
+import type { Tarif, Kostenträger } from "./billing/types.js";
 
 export interface BillingInfo {
-	tariff: BillingTariff;
-	target: BillingType;
+	tariff: Tarif;
+	target: Kostenträger;
 }
 
 export interface ProgramResultError {
@@ -16,11 +12,11 @@ export interface ProgramResultError {
 
 export type ProgramResultNonError =
 	| {
-			transportType: Exclude<TransportType, TransportType.Verrechenbar>;
+			transportType: Exclude<Transportart, Transportart.Verrechenbar>;
 	  }
 	| {
-			transportType: TransportType.Verrechenbar;
-			callType: CallType;
+			transportType: Transportart.Verrechenbar;
+			callType: Einsatzart;
 			billing: BillingInfo;
 	  };
 

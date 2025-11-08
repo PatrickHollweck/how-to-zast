@@ -41,12 +41,15 @@ export class TestOutputProvider extends OutputProvider {
 
 export class TestInputProvider extends InputProvider {
 	private answers: PromptAnswersMap;
+	private askedQuestions: PromptKeys[];
+
 	private currentQuestionKey: PromptKeys | null = null;
 
 	constructor(answers: PromptAnswersMap) {
 		super();
 
 		this.answers = answers;
+		this.askedQuestions = [];
 	}
 
 	public setCurrentQuestion(key: PromptKeys) {
@@ -55,15 +58,25 @@ export class TestInputProvider extends InputProvider {
 
 	public override select<T>(options: SelectOptions<T>): Promise<T> {
 		if (this.currentQuestionKey == null) {
-			throw new Error(
-				`No answer was provided for the current question! (Title: "${options.title}")`,
-			);
+			throw new Error(`Die aktuelle Frage wurde nicht gesetzt!`);
 		}
 
+		this.askedQuestions.push(this.currentQuestionKey);
+
 		const answer = this.answers[this.currentQuestionKey] as T;
+
+		if (answer == null) {
+			throw new Error(
+				`Es wurde keine Antwort auf folgende die Frage mit diesem Titel bereitgestellt: "${options.title}"`,
+			);
+		}
 
 		return new Promise((resolve) => {
 			resolve(answer);
 		});
+	}
+
+	public getAskedQuestions() {
+		return this.askedQuestions;
 	}
 }

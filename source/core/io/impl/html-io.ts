@@ -185,6 +185,7 @@ export class HtmlInputProivder extends InputProvider {
 			"align-self-centert",
 		);
 
+		let descriptionShown = false;
 		explainButton$.addEventListener("click", () => {
 			for (const { button: button$ } of buttons) {
 				button$.parentElement
@@ -192,8 +193,15 @@ export class HtmlInputProivder extends InputProvider {
 					?.classList.toggle("d-none");
 
 				button$.parentElement?.classList.toggle("rounded-bottom");
-				button$.style.setProperty("--bs-btn-border-radius", "0");
+
+				if (descriptionShown) {
+					button$.style.removeProperty("--bs-btn-border-radius");
+				} else {
+					button$.style.setProperty("--bs-btn-border-radius", "0");
+				}
 			}
+
+			descriptionShown = !descriptionShown;
 		});
 
 		const card$ = await createCard(options.title, elements, {

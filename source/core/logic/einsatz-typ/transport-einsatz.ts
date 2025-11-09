@@ -7,30 +7,21 @@ import { AbrechnungsContext } from "../billing/types.js";
 import { Transportart, Einsatzart } from "../einsatzarten.js";
 
 import { findBillingType } from "../billing/billing.js";
-import { handleKtpDowngrade } from "../transport-typ/ktp-downgrade.js";
-import { handleKrankentransport } from "../transport-typ/krankentransport.js";
-import { handleNotarzteinsatz } from "../transport-typ/notarzt.js";
-import { isValidVehicleCallTransportCombination } from "../common/fahrzeug-schlagwort-validation.js";
 import { handleRtwNotfall } from "../transport-typ/notfall.js";
+import { handleKtpDowngrade } from "../transport-typ/ktp-downgrade.js";
+import { handleNotarzteinsatz } from "../transport-typ/notarzt.js";
+import { handleKrankentransport } from "../transport-typ/krankentransport.js";
 
 import {
 	handleKeinTransport,
-	handleKeinTransportNotarztAblehnung,
+	handleNotarztAblehnung,
 } from "./kein-transport.js";
 
 export async function handleCallToTransport(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
-	const transport = await ctx.prompts.wurdePatientTransportiert();
-
-	if (!transport) {
+	if (!(await ctx.prompts.wurdePatientTransportiert())) {
 		return await handleKeinTransport(ctx);
-	}
-
-	const validationResult = await isValidVehicleCallTransportCombination(ctx);
-
-	if (validationResult != null) {
-		return validationResult;
 	}
 
 	// Bei Transport von oder zu HuLaPla ist eine Arztbeteiligung o.ä irrelevant,
@@ -50,7 +41,7 @@ export async function handleCallToTransport(
 		(await ctx.prompts.ablehnungsgrundNotarzt()) !==
 			t.AblehungsgrundNotarzt.KeinGrund
 	) {
-		return await handleKeinTransportNotarztAblehnung(ctx);
+		return await handleNotarztAblehnung(ctx);
 	}
 
 	if (doctorInvolvement) {
@@ -58,12 +49,12 @@ export async function handleCallToTransport(
 	}
 
 	const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
-	const alarmType = await ctx.prompts.dispositionsSchlagwort();
+	const alarmType = await ctx.prompts.dispositionsStichwort();
 
 	switch (currentVehicle) {
 		case t.Fahrzeug.KTW:
 		case t.Fahrzeug.RTW:
-			if (alarmType === t.Disposition.VEF_Verlegung) {
+			if (alarmType === t.Stichwort.RD_VEF) {
 				return {
 					transportType: Transportart.Verrechenbar,
 					callType: Einsatzart.NA_Verlegung,
@@ -72,11 +63,11 @@ export async function handleCallToTransport(
 			}
 
 			if (
-				alarmType === t.Disposition.Notarzt &&
+				alarmType === t.Stichwort.RD_2 &&
 				!(await ctx.prompts.warNotarztBeteiligt())
 			) {
 				await ctx.messages.disponierterNotarzteinsatzOhneNotarzt();
-				ctx.setCached("dispositionsSchlagwort", t.Disposition.Notfall);
+				ctx.setCached("dispositionsStichwort", t.Stichwort.RD_1);
 
 				return await handleCallToTransport(ctx);
 			}
@@ -87,7 +78,7 @@ export async function handleCallToTransport(
 		case t.Fahrzeug.NAW:
 			break;
 		case t.Fahrzeug.ITW:
-			if (alarmType === t.Disposition.ITW) {
+			if (alarmType === t.Stichwort.RD_ITW) {
 				return {
 					transportType: Transportart.Verrechenbar,
 					callType: Einsatzart.NF_ITW,
@@ -98,7 +89,7 @@ export async function handleCallToTransport(
 
 	const perceptionAsEmergency = await ctx.prompts.wahrnehmungAlsNotfall();
 
-	if (alarmType === t.Disposition.Krankentransport && !perceptionAsEmergency) {
+	if (alarmType === t.Stichwort.RD_KTP && !perceptionAsEmergency) {
 		return await handleKrankentransport(ctx);
 	}
 
@@ -112,7 +103,7 @@ export async function handleCallToTransport(
 		};
 	}
 
-	if (alarmType > t.Disposition.Krankentransport && !perceptionAsEmergency) {
+	if (alarmType > t.Stichwort.RD_KTP && !perceptionAsEmergency) {
 		return await handleKtpDowngrade(ctx);
 	}
 

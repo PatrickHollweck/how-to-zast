@@ -7,7 +7,9 @@ test("Kein Patient angetroffen = EA 9", async () => {
 	await runTest(
 		{
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
-			szenario: t.Szenario.Rettungsfahrt,
+			einsatzSzenario: t.EinsatzZweck.Transport,
+			welchesEingesetzteFahrzeug: t.Fahrzeug.RTW,
+			dispositionsStichwort: t.Stichwort.RD_KTP,
 			wurdePatientTransportiert: false,
 			wurdePatientAngetroffen: false,
 		},
@@ -19,10 +21,12 @@ test("Kein Transport, sichere Todeszeichen = EA 8", async () => {
 	await runTest(
 		{
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
-			szenario: t.Szenario.Rettungsfahrt,
 			wurdePatientTransportiert: false,
 			wurdePatientAngetroffen: true,
+			welchesEingesetzteFahrzeug: t.Fahrzeug.RTW,
 			beiEintreffenSichereTodeszeichen: true,
+			einsatzSzenario: t.EinsatzZweck.Transport,
+			dispositionsStichwort: t.Stichwort.RD_KTP,
 		},
 		{ transportType: Transportart.NichtVerrechenbar },
 	);
@@ -31,21 +35,21 @@ test("Kein Transport, sichere Todeszeichen = EA 8", async () => {
 test("Kein Transport, KTW/RTW, Keine Übergabe, Kein NA  = EA 8", async () => {
 	for (const vehicle of [t.Fahrzeug.KTW, t.Fahrzeug.RTW]) {
 		for (const callType of [
-			t.Disposition.Krankentransport,
-			t.Disposition.Notfall,
-			t.Disposition.Notarzt,
+			t.Stichwort.RD_KTP,
+			t.Stichwort.RD_1,
+			t.Stichwort.RD_2,
 		]) {
 			await runTest(
 				{
 					vorhaltung: t.Vorhaltung.Regelvorhaltung,
-					szenario: t.Szenario.Rettungsfahrt,
+					einsatzSzenario: t.EinsatzZweck.Transport,
+					dispositionsStichwort: callType,
 					wurdePatientTransportiert: false,
 					wurdePatientAngetroffen: true,
 					beiEintreffenSichereTodeszeichen: false,
 					welchesEingesetzteFahrzeug: vehicle,
 					// Es is besser trotzdem nach dem Fahrzeug und Stichwort zu fragen um hier NEF usw. nicht zu erlauben!
 					anderesFahrzeugTransportiert: t.ÜbergabeTyp.Keine,
-					dispositionsSchlagwort: callType,
 					warNotarztBeteiligt: false,
 				},
 				{ transportType: Transportart.NichtVerrechenbar },
@@ -56,19 +60,14 @@ test("Kein Transport, KTW/RTW, Keine Übergabe, Kein NA  = EA 8", async () => {
 
 test("Kein Transport, KTW/RTW, VEF-Verlegung  = EA 8", async () => {
 	for (const vehicle of [t.Fahrzeug.KTW, t.Fahrzeug.RTW]) {
-		for (const callType of [t.Disposition.VEF_Verlegung]) {
-			await runTest(
-				{
-					vorhaltung: t.Vorhaltung.Regelvorhaltung,
-					szenario: t.Szenario.Rettungsfahrt,
-					wurdePatientTransportiert: false,
-					wurdePatientAngetroffen: true,
-					beiEintreffenSichereTodeszeichen: false,
-					welchesEingesetzteFahrzeug: vehicle,
-					dispositionsSchlagwort: callType,
-				},
-				{ error: "" },
-			);
-		}
+		await runTest(
+			{
+				vorhaltung: t.Vorhaltung.Regelvorhaltung,
+				wurdePatientTransportiert: false,
+				welchesEingesetzteFahrzeug: vehicle,
+				dispositionsStichwort: t.Stichwort.RD_VEF,
+			},
+			{ error: "" },
+		);
 	}
 });

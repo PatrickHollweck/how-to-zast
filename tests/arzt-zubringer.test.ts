@@ -9,7 +9,8 @@ test("Arzt-Zubringer mit KTW, RTW = EA 5", async () => {
 		await runTest(
 			{
 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
-				szenario: t.Szenario.ArztZubringer,
+				dispositionsStichwort: t.Stichwort.RD_1,
+				einsatzSzenario: t.EinsatzZweck.ArztZubringer,
 				welchesEingesetzteFahrzeug: vehicle,
 			},
 			{ transportType: Transportart.NA_VA_Zubringer },
@@ -20,7 +21,7 @@ test("Arzt-Zubringer mit NEF = EA 6", async () => {
 	await runTest(
 		{
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
-			szenario: t.Szenario.ArztZubringer,
+			dispositionsStichwort: t.Stichwort.RD_1,
 			welchesEingesetzteFahrzeug: t.Fahrzeug.NEF,
 		},
 		{ transportType: Transportart.NEF_Einsatz },
@@ -31,7 +32,7 @@ test("Arzt-Zubringer mit VEF = EA 7", async () => {
 	await runTest(
 		{
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
-			szenario: t.Szenario.ArztZubringer,
+			dispositionsStichwort: t.Stichwort.RD_VEF,
 			welchesEingesetzteFahrzeug: t.Fahrzeug.VEF,
 		},
 		{ transportType: Transportart.VEF_Einsatz },
@@ -43,11 +44,11 @@ test("Arzt-Zubringer mit NAW, ITW = NAV", async () => {
 		await runTest(
 			{
 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
-				szenario: t.Szenario.ArztZubringer,
+				dispositionsStichwort: t.Stichwort.RD_1,
+				einsatzSzenario: t.EinsatzZweck.ArztZubringer,
 				welchesEingesetzteFahrzeug: vehicle,
 				wurdePatientAngetroffen: true,
 				beiEintreffenSichereTodeszeichen: false,
-				dispositionsSchlagwort: t.Disposition.Notarzt,
 				anderesFahrzeugTransportiert: t.ÜbergabeTyp.Keine,
 				notfallSzenarioMitNA: t.NotarzteinsatzTyp.Internistisch,
 				transportUrsprungOderZielHuLaPla: false,

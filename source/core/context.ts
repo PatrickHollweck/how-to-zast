@@ -16,8 +16,8 @@ export class PromptContext {
 	constructor(io: IOProvider) {
 		this.io = io;
 		this.cache = new Map();
-		this.prompts = this.memoize(new Prompts(io));
 		this.messages = new Messages(io);
+		this.prompts = this.memoize(new Prompts(this));
 	}
 
 	private memoize(prompts: Prompts) {

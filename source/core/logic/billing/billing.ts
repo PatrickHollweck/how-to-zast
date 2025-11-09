@@ -51,7 +51,7 @@ async function handleNotfall(ctx: PromptContext): Promise<BillingInfo> {
 	}
 
 	if (
-		(await ctx.prompts.dispositionsSchlagwort()) === t.Disposition.ITW &&
+		(await ctx.prompts.dispositionsStichwort()) === t.Stichwort.ITW_Einsatz &&
 		currentVehicle === t.Fahrzeug.ITW
 	) {
 		return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF);

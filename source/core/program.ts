@@ -28,26 +28,100 @@ async function startPrompting(ctx: PromptContext): Promise<ProgramResult> {
 		};
 	}
 
-	switch (await ctx.prompts.szenario()) {
-		case t.Szenario.Rettungsfahrt:
-			return await handleCallToTransport(ctx);
-		case t.Szenario.ArztZubringer:
-			return await handleArztZubringer(ctx);
-		case t.Szenario.Dienstfahrt:
-			return { transportType: Transportart.Dienstfahrt };
-		case t.Szenario.Werkstattfahrt:
+	const alarmType = await ctx.prompts.dispositionsStichwort();
+
+	switch (alarmType) {
+		case t.Stichwort.RD_KTP:
+		case t.Stichwort.RD_1:
+		case t.Stichwort.RD_2:
+		case t.Stichwort.RD_VEF:
+		case t.Stichwort.RD_ITW: {
+			const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
+
+			switch (alarmType) {
+				case t.Stichwort.RD_1:
+				case t.Stichwort.RD_2:
+				case t.Stichwort.RD_KTP:
+					if ([t.Fahrzeug.NEF, t.Fahrzeug.VEF].includes(currentVehicle)) {
+						await ctx.io.out.alert(ctx.messages.KEIN_TRANSPORTMITTEL);
+
+						return await handleArztZubringer(ctx);
+					}
+
+					break;
+				case t.Stichwort.RD_VEF:
+					if (currentVehicle === t.Fahrzeug.VEF) {
+						return handleArztZubringer(ctx);
+					}
+
+					if ([t.Fahrzeug.NAW, t.Fahrzeug.NEF].includes(currentVehicle)) {
+						return { error: ctx.messages.NEF_ODER_NAW_ZU_VEF_VERLEGUNG };
+					}
+
+					if (!(await ctx.prompts.wurdePatientTransportiert())) {
+						return { error: ctx.messages.VERLEGUNG_OHNE_TRANSPORT };
+					}
+
+					if (
+						(await ctx.prompts.anderesFahrzeugTransportiert()) !==
+						t.ÜbergabeTyp.Keine
+					) {
+						await ctx.io.out.alert(
+							ctx.messages.VEF_VERLEGUNG_ÜBERGABE_NICHT_MÖGL,
+						);
+
+						return {
+							transportType: Transportart.NichtVerrechenbar,
+						};
+					}
+
+					break;
+				case t.Stichwort.RD_ITW:
+					if (currentVehicle !== t.Fahrzeug.ITW) {
+						return { error: ctx.messages.DISPOSITION_NICHT_ITW_ZU_ITW_EINSATZ };
+					}
+			}
+
+			if (
+				currentVehicle === t.Fahrzeug.ITW ||
+				currentVehicle === t.Fahrzeug.NAW
+			) {
+				ctx.setCached("warNotarztBeteiligt", true);
+				ctx.setCached(
+					"ablehnungsgrundNotarzt",
+					t.AblehungsgrundNotarzt.KeinGrund,
+				);
+			}
+
+			switch (await ctx.prompts.einsatzSzenario()) {
+				case t.EinsatzZweck.Transport:
+					return await handleCallToTransport(ctx);
+
+				case t.EinsatzZweck.ArztZubringer:
+					return await handleArztZubringer(ctx);
+
+				default:
+					return { error: "Unbekanntes Einsatzszenario!" };
+			}
+		}
+		case t.Stichwort.RD_MANV:
+			return { error: "Not implemented" };
+
+		case t.Stichwort.RD_Absicherung_Dienstfahrt:
+			return {
+				transportType: Transportart.Dienstfahrt,
+			};
+
+		case t.Stichwort.RD_Absicherung_Gebietsabsicherung:
+			return {
+				transportType: Transportart.Gebietsabsicherung,
+			};
+
+		case t.Stichwort.RD_Sonstige_Werkstattfahrt:
 			await ctx.messages.reparaturLängerAlsEinTag();
 
 			return {
 				transportType: Transportart.Werkstattfahrt,
 			};
-		case t.Szenario.Gebietsabsicherung: {
-			return {
-				transportType: Transportart.Gebietsabsicherung,
-			};
-		}
-		default: {
-			return { error: "Unbekanntes Szenario!" };
-		}
 	}
 }

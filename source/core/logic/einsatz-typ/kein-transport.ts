@@ -10,7 +10,6 @@ import { handleRTH } from "../transport-typ/rth.js";
 import { findBillingType } from "../billing/billing.js";
 import { handleRtwNotfall } from "../transport-typ/notfall.js";
 import { handleKtpDowngrade } from "../transport-typ/ktp-downgrade.js";
-import { isValidVehicleCallTransportCombination } from "../common/fahrzeug-schlagwort-validation.js";
 
 export async function handleKeinTransport(
 	ctx: PromptContext,
@@ -27,40 +26,32 @@ export async function handleKeinTransport(
 		};
 	}
 
-	const validationResult = await isValidVehicleCallTransportCombination(ctx);
-
-	if (validationResult != null) {
-		return validationResult;
-	}
-
-	const transferToOtherVehicleType =
-		await ctx.prompts.anderesFahrzeugTransportiert();
-
-	if (transferToOtherVehicleType !== t.ÜbergabeTyp.Keine) {
-		if (transferToOtherVehicleType === t.ÜbergabeTyp.Luftgebunden) {
+	switch (await ctx.prompts.anderesFahrzeugTransportiert()) {
+		case t.ÜbergabeTyp.Keine:
+			break;
+		case t.ÜbergabeTyp.Luftgebunden:
 			return await handleRTH(ctx);
-		}
+		case t.ÜbergabeTyp.Bodengebunden:
+			switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
+				case t.Fahrzeug.NEF:
+				case t.Fahrzeug.VEF:
+					return { error: ctx.messages.KEIN_TRANSPORTMITTEL };
+				case t.Fahrzeug.KTW:
+				case t.Fahrzeug.RTW:
+					return {
+						transportType: Transportart.NichtVerrechenbar,
+					};
+				case t.Fahrzeug.NAW:
+				case t.Fahrzeug.ITW:
+					await ctx.messages.arztbesetztesRettungsmittelKeinTransport();
 
-		switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
-			case t.Fahrzeug.NEF:
-			case t.Fahrzeug.VEF:
-				return { error: ctx.messages.KEIN_TRANSPORTMITTEL };
-			case t.Fahrzeug.KTW:
-			case t.Fahrzeug.RTW:
-				return {
-					transportType: Transportart.NichtVerrechenbar,
-				};
-			case t.Fahrzeug.NAW:
-			case t.Fahrzeug.ITW:
-				await ctx.messages.arztbesetztesRettungsmittelKeinTransport();
+					ctx.setCached(
+						"ablehnungsgrundNotarzt",
+						t.AblehungsgrundNotarzt.KeinGrund,
+					);
 
-				ctx.setCached(
-					"ablehnungsgrundNotarzt",
-					t.AblehungsgrundNotarzt.KeinGrund,
-				);
-
-				ctx.setCached("warNotarztBeteiligt", true);
-		}
+					ctx.setCached("warNotarztBeteiligt", true);
+			}
 	}
 
 	const doctorInvolvement = await ctx.prompts.warNotarztBeteiligt();
@@ -80,7 +71,7 @@ export async function handleKeinTransport(
 		case t.AblehungsgrundNotarzt.Luftrettungsmittel:
 			ctx.setCached("ablehnungsgrundNotarzt", doctorNotBillableReason);
 
-			return await handleKeinTransportNotarztAblehnung(ctx);
+			return await handleNotarztAblehnung(ctx);
 		case t.AblehungsgrundNotarzt.NAW_ITW:
 		case t.AblehungsgrundNotarzt.NichtImDienst:
 		case t.AblehungsgrundNotarzt.KeineLeistung:
@@ -88,10 +79,10 @@ export async function handleKeinTransport(
 			return { transportType: Transportart.NichtVerrechenbar };
 	}
 
-	return await handleKeinTransportNAV(ctx);
+	return await handleNAV(ctx);
 }
 
-export async function handleKeinTransportNAV(ctx: PromptContext) {
+export async function handleNAV(ctx: PromptContext) {
 	await ctx.messages.hinweiseNAV();
 
 	switch (await ctx.prompts.notfallSzenarioMitNA()) {
@@ -118,7 +109,7 @@ export async function handleKeinTransportNAV(ctx: PromptContext) {
 	}
 }
 
-export async function handleKeinTransportNotfall(
+export async function handleKeinTransportAlsNotfall(
 	ctx: PromptContext,
 	patientTransported = true,
 ): Promise<ProgramResult> {
@@ -155,12 +146,10 @@ export async function handleKeinTransportNotfall(
 	}
 }
 
-export async function handleKeinTransportNotarztAblehnung(
+export async function handleNotarztAblehnung(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
-	const doctorNotBillableReason = await ctx.prompts.ablehnungsgrundNotarzt();
-
-	switch (doctorNotBillableReason) {
+	switch (await ctx.prompts.ablehnungsgrundNotarzt()) {
 		case t.AblehungsgrundNotarzt.KeinGrund:
 			break;
 		case t.AblehungsgrundNotarzt.KeineLeistung:
@@ -177,7 +166,7 @@ export async function handleKeinTransportNotarztAblehnung(
 		case t.AblehungsgrundNotarzt.NichtAusBayern:
 			await ctx.messages.hinweisNotarztHerkunftAngeben();
 
-			return await handleKeinTransportNotfall(
+			return await handleKeinTransportAlsNotfall(
 				ctx,
 				await ctx.prompts.wurdePatientTransportiert(),
 			);

@@ -4,11 +4,10 @@ import type { PromptContext } from "../../context.js";
 import * as t from "../../prompts/types.js";
 
 import { handleCallToTransport } from "../einsatz-typ/transport-einsatz.js";
-import { isValidVehicleCallTransportCombination } from "../common/fahrzeug-schlagwort-validation.js";
 
 import {
 	handleKeinTransport,
-	handleKeinTransportNotfall,
+	handleKeinTransportAlsNotfall,
 } from "../einsatz-typ/kein-transport.js";
 
 export async function handleRTH(ctx: PromptContext): Promise<ProgramResult> {
@@ -16,12 +15,6 @@ export async function handleRTH(ctx: PromptContext): Promise<ProgramResult> {
 	const transportType = await ctx.prompts.transportBeiHeliBeteiligung();
 
 	ctx.setCached("ablehnungsgrundNotarzt", t.AblehungsgrundNotarzt.KeinGrund);
-
-	const validationResult = await isValidVehicleCallTransportCombination(ctx);
-
-	if (validationResult != null) {
-		return validationResult;
-	}
 
 	if (groundDoctorInvolved) {
 		await ctx.messages.hinweisBodengebundenenNotarztAngeben();
@@ -39,11 +32,9 @@ export async function handleRTH(ctx: PromptContext): Promise<ProgramResult> {
 			case t.RthTransportTyp.Luftgebunden:
 				ctx.setCached("wahrnehmungAlsNotfall", true);
 				ctx.setCached("wurdePatientTransportiert", true);
-				ctx.setCached("dispositionsSchlagwort", t.Disposition.Notarzt);
+				ctx.setCached("dispositionsStichwort", t.Stichwort.RD_2);
 
 				return await handleCallToTransport(ctx);
-			default:
-				throw new Error("Unbekannter Transport-Typ!");
 		}
 	}
 
@@ -63,9 +54,8 @@ export async function handleRTH(ctx: PromptContext): Promise<ProgramResult> {
 			}
 
 		// -- fallthrough..
-		case t.RthTransportTyp.Luftgebunden: {
-			return await handleKeinTransportNotfall(ctx);
-		}
+		case t.RthTransportTyp.Luftgebunden:
+			return await handleKeinTransportAlsNotfall(ctx);
 		default:
 			throw new Error("Unbekannter Transport-Typ!");
 	}

@@ -1,10 +1,10 @@
 import "bootstrap";
 
 import { marked } from "marked";
+import { Transportart } from "../../logic/einsatzarten.js";
 import { MessageType, OutputProvider } from "../output-provider.js";
 import { InputProvider, type SelectOptions } from "../input-provider.js";
 
-import { Transportart } from "../../logic/einsatzarten.js";
 import type { ProgramResultNonError } from "../../logic/types.js";
 
 export class HtmlOutputProvider extends OutputProvider {
@@ -12,18 +12,12 @@ export class HtmlOutputProvider extends OutputProvider {
 		const display$ = document.createElement("div");
 		display$.classList.add("fs-5");
 
-		if (result.transportType === Transportart.Verrechenbar) {
-			display$.innerHTML = await md2html(`
+		display$.innerHTML = await md2html(`
 - Transportart: **${result.transportType.toString()}**
-- Einsatzart: **${result.callType.toString()}**
-- Tarif: **${result.billing.tariff.toString()}**
-- Kostenträgertyp: **${result.billing.target.toString()}**
+- Einsatzart: ${result.transportType === Transportart.Verrechenbar ? `**${result.callType.toString()}**` : "*keine Angabe*"}
+- Tarif: ${result.transportType === Transportart.Verrechenbar ? `**${result.billing.tariff.toString()}**` : "*keine Angabe*"}
+- Kostenträgertyp: ${result.transportType === Transportart.Verrechenbar ? `**${result.billing.target.toString()}**` : "*keine Angabe*"}
 			`);
-		} else {
-			display$.innerHTML = await md2html(
-				`Transportart: **${result.transportType.toString()}**`,
-			);
-		}
 
 		await createCard("Einsatzabrechnung", [display$], {
 			description:

@@ -124,6 +124,15 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 		);
 	}
 
+	public async arztbesetztesRettungsmittelKeinTransport() {
+		await this.io.out.info(
+			`In diesem Fall wird davon ausgegangen, dass der NAW oder ITW den Patienten versorgt hat und den Transport dann an ein nicht arztbesetztes Rettungsmittel abgegeben hat.
+			<hr/>
+			Das arztbesetzte Rettungsmittel schreibt eine NAV und das nicht arztbesetzte Rettungsmittel einen Krankentransport, unabhängig davon ob der Notarzt begleitet oder nicht!
+			`,
+		);
+	}
+
 	public async hinweiseNAV() {
 		await this.io.out.info(`
 **Zu beachten:**

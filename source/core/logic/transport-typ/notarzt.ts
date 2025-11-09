@@ -8,7 +8,7 @@ import { Transportart, Einsatzart } from "../einsatzarten.js";
 
 import { Kostenträger, Tarif, AbrechnungsContext } from "../billing/types.js";
 
-export async function handleTransportWithDoctorInvolvement(
+export async function handleNotarzteinsatz(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	const callType = {

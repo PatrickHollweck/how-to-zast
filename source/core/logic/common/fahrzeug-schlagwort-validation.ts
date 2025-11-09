@@ -1,10 +1,10 @@
-import type { PromptContext } from "../context.js";
-import type { ProgramResult } from "../logic/types.js";
+import type { PromptContext } from "../../context.js";
+import type { ProgramResult } from "../types.js";
 
-import * as t from "../prompts/types.js";
+import * as t from "../../prompts/types.js";
 
-import { Transportart } from "./einsatzarten.js";
-import { handleDoctorTransportToCallSite } from "./einsatz-typ/arzt-zubringer.js";
+import { Transportart } from "../einsatzarten.js";
+import { handleArztZubringer } from "../einsatz-typ/arzt-zubringer.js";
 
 export async function isValidVehicleCallTransportCombination(
 	ctx: PromptContext,
@@ -19,7 +19,7 @@ export async function isValidVehicleCallTransportCombination(
 			if ([t.Fahrzeug.NEF, t.Fahrzeug.VEF].includes(currentVehicle)) {
 				await ctx.io.out.alert(ctx.messages.KEIN_TRANSPORTMITTEL);
 
-				return await handleDoctorTransportToCallSite(ctx);
+				return await handleArztZubringer(ctx);
 			}
 
 			break;

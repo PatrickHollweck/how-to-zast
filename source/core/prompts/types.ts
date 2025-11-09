@@ -67,7 +67,7 @@ export enum AblehungsgrundNotarzt {
 	KeineLeistung,
 }
 
-export enum RthTrnasportTyp {
+export enum RthTransportTyp {
 	KeinTransport,
 	Bodengebunden,
 	Luftgebunden,

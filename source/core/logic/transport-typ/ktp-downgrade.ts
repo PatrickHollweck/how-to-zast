@@ -1,11 +1,11 @@
-import type { PromptContext } from "../context.js";
-import type { ProgramResult } from "../logic/types.js";
+import type { PromptContext } from "../../context.js";
+import type { ProgramResult } from "../types.js";
 
-import * as t from "../prompts/types.js";
+import * as t from "../../prompts/types.js";
 
-import { findBillingType } from "./billing/billing.js";
-import { AbrechnungsContext } from "./billing/types.js";
-import { Transportart, Einsatzart } from "./einsatzarten.js";
+import { findBillingType } from "../billing/billing.js";
+import { AbrechnungsContext } from "../billing/types.js";
+import { Transportart, Einsatzart } from "../einsatzarten.js";
 
 export async function handleKtpDowngrade(
 	ctx: PromptContext,

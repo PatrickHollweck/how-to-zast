@@ -1,18 +1,18 @@
-import type { PromptContext } from "../context.js";
-import type { ProgramResult } from "./types.js";
+import type { PromptContext } from "../../context.js";
+import type { ProgramResult } from "../types.js";
 
-import * as t from "../prompts/types.js";
+import * as t from "../../prompts/types.js";
 
-import { AbrechnungsContext } from "./billing/types.js";
-import { Transportart, Einsatzart } from "./einsatzarten.js";
+import { AbrechnungsContext } from "../billing/types.js";
+import { Transportart, Einsatzart } from "../einsatzarten.js";
 
-import { findBillingType } from "./billing/billing.js";
-import { handleKtpDowngrade } from "./ktp-downgrade.js";
-import { handleAirTransport } from "./transport-typ/rth.js";
-import { isValidVehicleCallTransportCombination } from "./fahrzeug-schlagwort-validation.js";
-import { handleTransportWithoutDoctorInvolvementRTW } from "./transport-typ/notfall.js";
+import { handleRTH } from "../transport-typ/rth.js";
+import { findBillingType } from "../billing/billing.js";
+import { handleRtwNotfall } from "../transport-typ/notfall.js";
+import { handleKtpDowngrade } from "../transport-typ/ktp-downgrade.js";
+import { isValidVehicleCallTransportCombination } from "../common/fahrzeug-schlagwort-validation.js";
 
-export async function handleNonTransport(
+export async function handleKeinTransport(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	if (!(await ctx.prompts.wurdePatientAngetroffen())) {
@@ -36,22 +36,24 @@ export async function handleNonTransport(
 	const transferToOtherVehicleType =
 		await ctx.prompts.anderesFahrzeugTransportiert();
 
-	if (transferToOtherVehicleType) {
+	if (transferToOtherVehicleType !== t.ÜbergabeTyp.Keine) {
 		if (transferToOtherVehicleType === t.ÜbergabeTyp.Luftgebunden) {
-			return await handleAirTransport(ctx);
+			return await handleRTH(ctx);
 		}
 
 		switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
+			case t.Fahrzeug.NEF:
+			case t.Fahrzeug.VEF:
+				return { error: ctx.messages.KEIN_TRANSPORTMITTEL };
 			case t.Fahrzeug.KTW:
 			case t.Fahrzeug.RTW:
-			case t.Fahrzeug.NEF:
-			case t.Fahrzeug.VEF: {
 				return {
 					transportType: Transportart.NichtVerrechenbar,
 				};
-			}
 			case t.Fahrzeug.NAW:
 			case t.Fahrzeug.ITW:
+				await ctx.messages.arztbesetztesRettungsmittelKeinTransport();
+
 				ctx.setCached(
 					"ablehnungsgrundNotarzt",
 					t.AblehungsgrundNotarzt.KeinGrund,
@@ -78,7 +80,7 @@ export async function handleNonTransport(
 		case t.AblehungsgrundNotarzt.Luftrettungsmittel:
 			ctx.setCached("ablehnungsgrundNotarzt", doctorNotBillableReason);
 
-			return await handleNonTransport_DoctorNotBillable(ctx);
+			return await handleKeinTransportNotarztAblehnung(ctx);
 		case t.AblehungsgrundNotarzt.NAW_ITW:
 		case t.AblehungsgrundNotarzt.NichtImDienst:
 		case t.AblehungsgrundNotarzt.KeineLeistung:
@@ -86,6 +88,10 @@ export async function handleNonTransport(
 			return { transportType: Transportart.NichtVerrechenbar };
 	}
 
+	return await handleKeinTransportNAV(ctx);
+}
+
+export async function handleKeinTransportNAV(ctx: PromptContext) {
 	await ctx.messages.hinweiseNAV();
 
 	switch (await ctx.prompts.notfallSzenarioMitNA()) {
@@ -112,7 +118,7 @@ export async function handleNonTransport(
 	}
 }
 
-export async function handleNonTransport_NF(
+export async function handleKeinTransportNotfall(
 	ctx: PromptContext,
 	patientTransported = true,
 ): Promise<ProgramResult> {
@@ -149,13 +155,10 @@ export async function handleNonTransport_NF(
 	}
 }
 
-export async function handleNonTransport_DoctorNotBillable(
+export async function handleKeinTransportNotarztAblehnung(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	const doctorNotBillableReason = await ctx.prompts.ablehnungsgrundNotarzt();
-
-	const isKTW =
-		(await ctx.prompts.welchesEingesetzteFahrzeug()) === t.Fahrzeug.KTW;
 
 	switch (doctorNotBillableReason) {
 		case t.AblehungsgrundNotarzt.KeinGrund:
@@ -166,20 +169,20 @@ export async function handleNonTransport_DoctorNotBillable(
 			await ctx.messages.notarztNichtAbrechnungsfähig();
 			ctx.setCached("warNotarztBeteiligt", false);
 
-			if (isKTW) {
+			if ((await ctx.prompts.welchesEingesetzteFahrzeug()) === t.Fahrzeug.KTW) {
 				return handleKtpDowngrade(ctx);
 			}
 
-			return await handleTransportWithoutDoctorInvolvementRTW(ctx);
+			return await handleRtwNotfall(ctx);
 		case t.AblehungsgrundNotarzt.NichtAusBayern:
 			await ctx.messages.hinweisNotarztHerkunftAngeben();
 
-			return await handleNonTransport_NF(
+			return await handleKeinTransportNotfall(
 				ctx,
 				await ctx.prompts.wurdePatientTransportiert(),
 			);
 		case t.AblehungsgrundNotarzt.Luftrettungsmittel:
-			return await handleAirTransport(ctx);
+			return await handleRTH(ctx);
 		case t.AblehungsgrundNotarzt.NAW_ITW: {
 			const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
 
@@ -205,7 +208,7 @@ export async function handleNonTransport_DoctorNotBillable(
 					await ctx.messages.notarztNichtAbrechnungsfähig();
 					ctx.setCached("warNotarztBeteiligt", false);
 
-					return await handleTransportWithoutDoctorInvolvementRTW(ctx);
+					return await handleRtwNotfall(ctx);
 			}
 		}
 	}

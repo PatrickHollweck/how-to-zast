@@ -7,16 +7,16 @@ import { AbrechnungsContext } from "../billing/types.js";
 import { Transportart, Einsatzart } from "../einsatzarten.js";
 
 import { findBillingType } from "../billing/billing.js";
-import { handleKtpDowngrade } from "../ktp-downgrade.js";
+import { handleKtpDowngrade } from "../transport-typ/ktp-downgrade.js";
 import { handleKrankentransport } from "../transport-typ/krankentransport.js";
-import { handleTransportWithDoctorInvolvement } from "../transport-typ/notarzt.js";
-import { isValidVehicleCallTransportCombination } from "../fahrzeug-schlagwort-validation.js";
-import { handleTransportWithoutDoctorInvolvementRTW } from "../transport-typ/notfall.js";
+import { handleNotarzteinsatz } from "../transport-typ/notarzt.js";
+import { isValidVehicleCallTransportCombination } from "../common/fahrzeug-schlagwort-validation.js";
+import { handleRtwNotfall } from "../transport-typ/notfall.js";
 
 import {
-	handleNonTransport,
-	handleNonTransport_DoctorNotBillable,
-} from "../kein-transport.js";
+	handleKeinTransport,
+	handleKeinTransportNotarztAblehnung,
+} from "./kein-transport.js";
 
 export async function handleCallToTransport(
 	ctx: PromptContext,
@@ -24,7 +24,7 @@ export async function handleCallToTransport(
 	const transport = await ctx.prompts.wurdePatientTransportiert();
 
 	if (!transport) {
-		return await handleNonTransport(ctx);
+		return await handleKeinTransport(ctx);
 	}
 
 	const validationResult = await isValidVehicleCallTransportCombination(ctx);
@@ -50,11 +50,11 @@ export async function handleCallToTransport(
 		(await ctx.prompts.ablehnungsgrundNotarzt()) !==
 			t.AblehungsgrundNotarzt.KeinGrund
 	) {
-		return await handleNonTransport_DoctorNotBillable(ctx);
+		return await handleKeinTransportNotarztAblehnung(ctx);
 	}
 
 	if (doctorInvolvement) {
-		return await handleTransportWithDoctorInvolvement(ctx);
+		return await handleNotarzteinsatz(ctx);
 	}
 
 	const currentVehicle = await ctx.prompts.welchesEingesetzteFahrzeug();
@@ -117,7 +117,7 @@ export async function handleCallToTransport(
 	}
 
 	if (currentVehicle === t.Fahrzeug.RTW) {
-		return await handleTransportWithoutDoctorInvolvementRTW(ctx);
+		return await handleRtwNotfall(ctx);
 	}
 
 	throw new Error("Unreachable!");

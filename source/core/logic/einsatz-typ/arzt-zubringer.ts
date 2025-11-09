@@ -4,9 +4,9 @@ import type { ProgramResult } from "../types.js";
 import * as t from "../../prompts/types.js";
 
 import { Transportart } from "../einsatzarten.js";
-import { handleNonTransport } from "../kein-transport.js";
+import { handleKeinTransport } from "./kein-transport.js";
 
-export async function handleDoctorTransportToCallSite(
+export async function handleArztZubringer(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	switch (await ctx.prompts.welchesEingesetzteFahrzeug()) {
@@ -26,6 +26,6 @@ export async function handleDoctorTransportToCallSite(
 				t.AblehungsgrundNotarzt.KeinGrund,
 			);
 
-			return await handleNonTransport(ctx);
+			return await handleKeinTransport(ctx);
 	}
 }

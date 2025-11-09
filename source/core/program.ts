@@ -2,9 +2,10 @@ import type { PromptContext } from "./context.js";
 import type { ProgramResult } from "./logic/types.js";
 
 import * as t from "./prompts/types.js";
+
 import { Transportart } from "./logic/einsatzarten.js";
+import { handleArztZubringer } from "./logic/einsatz-typ/arzt-zubringer.js";
 import { handleCallToTransport } from "./logic/einsatz-typ/transport-einsatz.js";
-import { handleDoctorTransportToCallSite } from "./logic/einsatz-typ/arzt-zubringer.js";
 
 export async function run(ctx: PromptContext): Promise<ProgramResult> {
 	const result = await startPrompting(ctx);
@@ -31,7 +32,7 @@ async function startPrompting(ctx: PromptContext): Promise<ProgramResult> {
 		case t.Szenario.Rettungsfahrt:
 			return await handleCallToTransport(ctx);
 		case t.Szenario.ArztZubringer:
-			return await handleDoctorTransportToCallSite(ctx);
+			return await handleArztZubringer(ctx);
 		case t.Szenario.Dienstfahrt:
 			return { transportType: Transportart.Dienstfahrt };
 		case t.Szenario.Werkstattfahrt:

@@ -4,11 +4,11 @@ import type { ProgramResult } from "../types.js";
 import * as t from "../../prompts/types.js";
 
 import { findBillingType } from "../billing/billing.js";
-import { handleKtpDowngrade } from "../ktp-downgrade.js";
+import { handleKtpDowngrade } from "./ktp-downgrade.js";
 import { AbrechnungsContext } from "../billing/types.js";
 import { Transportart, Einsatzart } from "../einsatzarten.js";
 
-export async function handleTransportWithoutDoctorInvolvementRTW(
+export async function handleRtwNotfall(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
 	const callScenario = await ctx.prompts.notfallSzenarioOhneNA();
@@ -25,7 +25,7 @@ export async function handleTransportWithoutDoctorInvolvementRTW(
 		if (await ctx.prompts.wahrnehmungAlsNotfall()) {
 			ctx.setCached("notfallSzenarioOhneNA", t.NotfalleinsatzTyp.Verlegung);
 
-			return await handleTransportWithoutDoctorInvolvementRTW(ctx);
+			return await handleRtwNotfall(ctx);
 		} else {
 			ctx.setCached("herabstufungGrundKTP", t.NotfallTyp_Downgrade.Holdienst);
 

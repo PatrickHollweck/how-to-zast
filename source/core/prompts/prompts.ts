@@ -161,15 +161,15 @@ export class Prompts {
 			choices: [
 				{
 					name: "...wurde **nicht** transportiert",
-					value: t.RthTrnasportTyp.KeinTransport,
+					value: t.RthTransportTyp.KeinTransport,
 				},
 				{
 					name: "...wurde mit **ihrem** Fahrzeug transportiert",
-					value: t.RthTrnasportTyp.Bodengebunden,
+					value: t.RthTransportTyp.Bodengebunden,
 				},
 				{
 					name: "...wurde mit dem **Helikopter** transportiert",
-					value: t.RthTrnasportTyp.Luftgebunden,
+					value: t.RthTransportTyp.Luftgebunden,
 				},
 			],
 		});

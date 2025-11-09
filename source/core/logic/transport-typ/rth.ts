@@ -17,15 +17,7 @@ export async function handleAirTransport(
 	const groundDoctorInvolved = await ctx.prompts.bodengebundenerNotarzt();
 	const transportType = await ctx.prompts.transportBeiHeliBeteiligung();
 
-	ctx.setCached(
-		"abrechnungsfähigkeitNotarzt_KeinTransport",
-		t.AblehungsgrundNotarzt.KeinGrund,
-	);
-
-	ctx.setCached(
-		"abrechnungsfähigkeitNotarzt_Transport",
-		t.AblehungsgrundNotarzt.KeinGrund,
-	);
+	ctx.setCached("ablehnungsgrundNotarzt", t.AblehungsgrundNotarzt.KeinGrund);
 
 	const validationResult = await isValidVehicleCallTransportCombination(ctx);
 
@@ -68,7 +60,7 @@ export async function handleAirTransport(
 
 			return await handleCallToTransport(ctx);
 		case t.RthTrnasportTyp.KeinTransport:
-			if (await ctx.prompts.abrechnungsfähigkeitNotarzt_NurRdAusreichend()) {
+			if (await ctx.prompts.ablehnungsgrundNotarzt_NurRdAusreichend()) {
 				return await handleNonTransport(ctx);
 			}
 

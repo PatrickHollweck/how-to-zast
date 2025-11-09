@@ -195,35 +195,30 @@ export class Prompts {
 		});
 	}
 
-	public async sonstigerNotfallKrankenhausTräger() {
-		return await this.io.in.selectBool(
+	public sonstigerNotfallKrankenhausTräger() {
+		return this.io.in.selectBool(
 			"Wurde von einem Krankenhaus abtransportiert *und* gibt es einen triftigen Grund weshalb das Krankenhaus die Kosten für den Transport tragen muss?",
 			"Beispiel: Keine zwingende Begründung für Transport mit Notarzt!",
 		);
 	}
 
-	public async abrechnungsfähigkeitNotarzt_NurRdAusreichend() {
-		return await this.io.in.selectBool(
+	public ablehnungsgrundNotarzt_NurRdAusreichend() {
+		return this.io.in.selectBool(
 			"Wäre eine reine Hilfeleistung durch den Rettungsdienst *ohne Notarzt* ausreichend gewesen?",
 			"Entscheidungshilfe: Hätte eine Nachforderung durch den Rettungsdienst stattgefunden, wenn der Notarzt nicht eh schon alarmiert gewesen wäre?",
 		);
 	}
 
-	public async abrechnungsfähigkeitNotarzt_KeinTransport() {
-		if (await this.abrechnungsfähigkeitNotarzt_NurRdAusreichend()) {
-			return t.AblehungsgrundNotarzt.KeineLeistung;
+	public async ablehnungsgrundNotarzt() {
+		if (!(await this.wurdePatientTransportiert())) {
+			if (await this.ablehnungsgrundNotarzt_NurRdAusreichend()) {
+				return t.AblehungsgrundNotarzt.KeineLeistung;
+			}
 		}
 
 		return this.io.in.select({
 			title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,
-			choices: getAbrechnungsfähigkeitNotarztChoices(true),
-		});
-	}
-
-	public abrechnungsfähigkeitNotarzt_Transport() {
-		return this.io.in.select({
-			title: `Trifft eine der folgenden Aussagen zu? **Der Notarzt...**`,
-			choices: getAbrechnungsfähigkeitNotarztChoices(true),
+			choices: getAbrechnungsfähigkeitNotarztChoices(false),
 		});
 	}
 

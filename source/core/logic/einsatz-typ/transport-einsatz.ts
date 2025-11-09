@@ -47,7 +47,7 @@ export async function handleCallToTransport(
 
 	if (
 		doctorInvolvement &&
-		(await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport()) !==
+		(await ctx.prompts.ablehnungsgrundNotarzt()) !==
 			t.AblehungsgrundNotarzt.KeinGrund
 	) {
 		return await handleNonTransport_DoctorNotBillable(ctx);

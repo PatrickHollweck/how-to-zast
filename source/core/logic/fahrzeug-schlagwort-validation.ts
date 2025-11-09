@@ -53,10 +53,7 @@ export async function isValidVehicleCallTransportCombination(
 	if (currentVehicle === t.Fahrzeug.ITW || currentVehicle === t.Fahrzeug.NAW) {
 		ctx.setCached("warNotarztBeteiligt", true);
 
-		ctx.setCached(
-			"abrechnungsfähigkeitNotarzt_Transport",
-			t.AblehungsgrundNotarzt.KeinGrund,
-		);
+		ctx.setCached("ablehnungsgrundNotarzt", t.AblehungsgrundNotarzt.KeinGrund);
 	}
 
 	return null;

@@ -53,12 +53,7 @@ export async function handleNonTransport(
 			case t.Fahrzeug.NAW:
 			case t.Fahrzeug.ITW:
 				ctx.setCached(
-					"abrechnungsfähigkeitNotarzt_Transport",
-					t.AblehungsgrundNotarzt.KeinGrund,
-				);
-
-				ctx.setCached(
-					"abrechnungsfähigkeitNotarzt_KeinTransport",
+					"ablehnungsgrundNotarzt",
 					t.AblehungsgrundNotarzt.KeinGrund,
 				);
 
@@ -74,18 +69,14 @@ export async function handleNonTransport(
 		};
 	}
 
-	const doctorNotBillableReason =
-		await ctx.prompts.abrechnungsfähigkeitNotarzt_KeinTransport();
+	const doctorNotBillableReason = await ctx.prompts.ablehnungsgrundNotarzt();
 
 	switch (doctorNotBillableReason) {
 		case t.AblehungsgrundNotarzt.KeinGrund:
 			break;
 		case t.AblehungsgrundNotarzt.NichtAusBayern:
 		case t.AblehungsgrundNotarzt.Luftrettungsmittel:
-			ctx.setCached(
-				"abrechnungsfähigkeitNotarzt_Transport",
-				doctorNotBillableReason,
-			);
+			ctx.setCached("ablehnungsgrundNotarzt", doctorNotBillableReason);
 
 			return await handleNonTransport_DoctorNotBillable(ctx);
 		case t.AblehungsgrundNotarzt.NAW_ITW:
@@ -161,8 +152,7 @@ export async function handleNonTransport_NF(
 export async function handleNonTransport_DoctorNotBillable(
 	ctx: PromptContext,
 ): Promise<ProgramResult> {
-	const doctorNotBillableReason =
-		await ctx.prompts.abrechnungsfähigkeitNotarzt_Transport();
+	const doctorNotBillableReason = await ctx.prompts.ablehnungsgrundNotarzt();
 
 	const isKTW =
 		(await ctx.prompts.welchesEingesetzteFahrzeug()) === t.Fahrzeug.KTW;

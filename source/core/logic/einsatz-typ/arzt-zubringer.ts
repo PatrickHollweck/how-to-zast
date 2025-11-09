@@ -22,7 +22,7 @@ export async function handleDoctorTransportToCallSite(
 		case t.Fahrzeug.ITW:
 		case t.Fahrzeug.NAW:
 			ctx.setCached(
-				"abrechnungsfähigkeitNotarzt_KeinTransport",
+				"ablehnungsgrundNotarzt",
 				t.AblehungsgrundNotarzt.KeinGrund,
 			);
 

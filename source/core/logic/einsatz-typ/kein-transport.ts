@@ -126,6 +126,7 @@ export async function handleKeinTransportAlsNotfall(
 		}
 
 		case t.NotfalleinsatzTyp.Verlegung:
+		case t.NotfalleinsatzTyp.Verlegung_VRTW:
 		case t.NotfalleinsatzTyp.NeugeborenenHoldienst:
 			if (!patientTransported) {
 				return {

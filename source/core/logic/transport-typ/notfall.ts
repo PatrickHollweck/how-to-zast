@@ -53,6 +53,7 @@ export async function handleRtwNotfall(
 	const callType = {
 		[t.NotfalleinsatzTyp.Verkehrsunfall]: Einsatzart.NF_Verkehrsunfall,
 		[t.NotfalleinsatzTyp.Verlegung]: Einsatzart.NF_Verlegung,
+		[t.NotfalleinsatzTyp.Verlegung_VRTW]: Einsatzart.NF_Verlegung_VRTW,
 		[t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall]: Einsatzart.NF_Arbeitsunfall,
 		[t.NotfalleinsatzTyp.Schulunfall]: Einsatzart.NF_Schulunfall,
 		[t.NotfalleinsatzTyp.Internistisch]: Einsatzart.NF_Internistisch,

@@ -51,7 +51,7 @@ async function handleNotfall(ctx: PromptContext): Promise<BillingInfo> {
 	}
 
 	if (
-		(await ctx.prompts.dispositionsStichwort()) === t.Stichwort.ITW_Einsatz &&
+		(await ctx.prompts.dispositionsStichwort()) === t.Stichwort.RD_ITW &&
 		currentVehicle === t.Fahrzeug.ITW
 	) {
 		return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF);
@@ -66,6 +66,8 @@ async function handleNotfall(ctx: PromptContext): Promise<BillingInfo> {
 		case t.NotfalleinsatzTyp.Internistisch:
 		case t.NotfalleinsatzTyp.SonstigerUnfall:
 			return handle_KTR_SZ(ctx, AbrechnungsContext.NF);
+		case t.NotfalleinsatzTyp.Verlegung_VRTW:
+			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF);
 		case t.NotfalleinsatzTyp.Verlegung:
 			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.NF);
 		case t.NotfalleinsatzTyp.Schulunfall:

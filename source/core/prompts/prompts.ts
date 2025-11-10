@@ -261,8 +261,12 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 		return this.ctx.io.in.select({
 			title: "Auf welchem Fahrzeug bist du eingesetzt?",
 			choices: [
-				{ name: "KTW / N-KTW", value: t.Fahrzeug.KTW },
-				{ name: "RTW", value: t.Fahrzeug.RTW },
+				{ name: "KTW, N-KTW", value: t.Fahrzeug.KTW },
+				{
+					name: "RTW",
+					description: "auch: V-RTW (Verlegungs-RTW)",
+					value: t.Fahrzeug.RTW,
+				},
 				{ name: "NEF", value: t.Fahrzeug.NEF },
 				{ name: "VEF", value: t.Fahrzeug.VEF },
 				{ name: "NAW", value: t.Fahrzeug.NAW },
@@ -351,6 +355,12 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 					name: "Verlegung",
 					value: t.NotfalleinsatzTyp.Verlegung,
 					description: "Verlegung von KHS A nach KHS B",
+				},
+				{
+					name: "Verlegung mit VRTW (Verlegungs-RTW)",
+					value: t.NotfalleinsatzTyp.Verlegung_VRTW,
+					description:
+						"Notfalleinsatz, dringende und planbare Verlegung ohne ITW-Bedarf",
 				},
 				{
 					name: "Internistischer Notfall",

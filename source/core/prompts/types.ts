@@ -58,6 +58,7 @@ export enum NotarzteinsatzTyp {
 export enum NotfalleinsatzTyp {
 	Verkehrsunfall,
 	Verlegung,
+	Verlegung_VRTW,
 	ArbeitsOderWegeUnfall,
 	Schulunfall,
 	Internistisch,

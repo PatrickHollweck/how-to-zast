@@ -33,6 +33,7 @@ export enum Einsatzart {
 	NF_Verlegung = 21,
 	NF_Arbeitsunfall = 22,
 	NF_Schulunfall = 23,
+	NF_Verlegung_VRTW = 24,
 	NF_Internistisch = 25,
 	NF_Sonstiger_Unfall = 26,
 	NF_kein_Transport_SonstNotfall = 27,

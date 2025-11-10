@@ -279,7 +279,8 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 		return this.ctx.io.in.selectBool(
 			"War ein **diensthabender Notarzt** an der **VERSORGUNG** ihres Patienten beteiligt?",
 			`<span style="color: red">**Ein Klinik-, zufällig anwesender Not-, oder Hausarzt zählt hier nicht!**</span>
-      Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte welche **aktiv** an der Patientenversorgung teilgenommen haben!`,
+			Ausschließlich: Diensthabende oder durch ILS in Dienst gestellte Verlegungs-, oder Notärzte welche **aktiv** an der Patientenversorgung teilgenommen haben!
+			**Unabhängig von Transportbegleitung durch den Notarzt!**`,
 			"Ja",
 			"Nein / Abbestellt",
 		);

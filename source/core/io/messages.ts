@@ -25,6 +25,9 @@ export class Messages {
 	public readonly VEF_VERLEGUNG_ÜBERGABE_NICHT_MÖGL =
 		"Eine VEF-Verlegung kann nicht abrechnungsfähig an ein anderes Transportmittel übergeben werden! Ihr Fahrzeug kann keinen Transport abrechnen. Das schlussendlich transportierende Rettungsmittel schreibt die VEF-Verlegung.";
 
+	public readonly ABRECHNUNG_MANV =
+		"Bei einem MANV ist die Abrechnungen mit der ZAST GmbH direkt zu klären!";
+
 	public async ktpNotfallHerabstufung() {
 		await this.io.out.warning(
 			`

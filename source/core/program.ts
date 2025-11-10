@@ -105,7 +105,7 @@ async function startPrompting(ctx: PromptContext): Promise<ProgramResult> {
 			}
 		}
 		case t.Stichwort.RD_MANV:
-			return { error: "Not implemented" };
+			return { error: ctx.messages.ABRECHNUNG_MANV };
 
 		case t.Stichwort.RD_Absicherung_Dienstfahrt:
 			return {

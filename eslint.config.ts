@@ -7,7 +7,13 @@ import eslintPrettier from "eslint-plugin-prettier";
 import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
-	globalIgnores(["dist", ".sassrc.cjs"]),
+	globalIgnores([
+		"dist",
+		"build-output",
+		".parcel-cache",
+		".sassrc.cjs",
+		"eslint.config.ts",
+	]),
 	{
 		files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
 		plugins: { js, eslintPrettier },

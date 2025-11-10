@@ -1,4 +1,6 @@
 {
+	"include": ["source/**/*.ts", "tests/**/*.ts"],
+	"exclude": ["build-output/**/*", "dist/**/*", ".parcel-cache/**/*"],
 	"compilerOptions": {
 		"rootDir": "./",
 		"outDir": "build-output",

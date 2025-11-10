@@ -18,7 +18,7 @@
 		"format": "prettier --write .",
 		"lint": "eslint .",
 		"lint:fix": "eslint .",
-		"codecheck": "npm run format && npm run lint && npm run start:test",
+		"codecheck": "npm run format && npm run lint && tsc && npm run start:test",
 		"build:prod": "parcel build source/targets/web/index.html",
 		"start:web": "parcel source/targets/web/index.html",
 		"start:test": "NODE_NO_WARNINGS=1 node --experimental-vm-modules node_modules/jest/bin/jest.js",

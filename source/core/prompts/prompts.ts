@@ -20,13 +20,13 @@ export class Prompts {
 				"Hauptaufgaben: Krankentransport, Notfallrettung, Notarztdienst",
 			choices: [
 				{
-					name: "**Regelvorhaltung**",
+					name: "Ja, **Regelvorhaltung**",
 					value: t.Vorhaltung.Regelvorhaltung,
 					description:
 						"Rettungsmittel die öffentlich-rechtlich regelhaft vorgehalten werden",
 				},
 				{
-					name: "Sonderbedarf",
+					name: "Nein, Sonderbedarf",
 					value: t.Vorhaltung.Sondereinsatz,
 					description: "z.B: LRD, UGRD, ORGL, ELRD, HvO, SEG-Einsatz",
 				},
@@ -39,7 +39,7 @@ export class Prompts {
 			title: "In welchem Rahmen fand der Einsatz statt?",
 			choices: [
 				{
-					name: "Öffentlich-Rechtliche Vorhaltung",
+					name: "**Öffentlich-Rechtliche Vorhaltung**",
 					value: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 				},
 				{

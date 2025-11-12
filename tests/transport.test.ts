@@ -6,6 +6,7 @@ import { runTest } from "./util.js";
 test("Kein Patient angetroffen = EA 9", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			einsatzSzenario: t.EinsatzZweck.Transport,
 			welchesEingesetzteFahrzeug: t.Fahrzeug.RTW,
@@ -20,6 +21,7 @@ test("Kein Patient angetroffen = EA 9", async () => {
 test("Kein Transport, sichere Todeszeichen = EA 8", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			wurdePatientTransportiert: false,
 			wurdePatientAngetroffen: true,
@@ -41,6 +43,7 @@ test("Kein Transport, KTW/RTW, Keine Übergabe, Kein NA  = EA 8", async () => {
 		]) {
 			await runTest(
 				{
+					kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 					vorhaltung: t.Vorhaltung.Regelvorhaltung,
 					einsatzSzenario: t.EinsatzZweck.Transport,
 					dispositionsStichwort: callType,
@@ -62,6 +65,7 @@ test("Kein Transport, KTW/RTW, VEF-Verlegung  = EA 8", async () => {
 	for (const vehicle of [t.Fahrzeug.KTW, t.Fahrzeug.RTW]) {
 		await runTest(
 			{
+				kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
 				wurdePatientTransportiert: false,
 				welchesEingesetzteFahrzeug: vehicle,

@@ -1,8 +1,9 @@
-import type { ProgramResultNonError } from "../../logic/types.js";
 import type { Prompts } from "../../prompts/prompts.js";
+import type { ProgramResultNonError } from "../../logic/types.js";
 
 import { MessageType, OutputProvider } from "../output-provider.js";
 import { InputProvider, type SelectOptions } from "../input-provider.js";
+
 import {
 	EMPTY_PROMISE_FUNCTION,
 	type PickAssignableKeys,

@@ -6,6 +6,7 @@ import { MessageType, OutputProvider } from "../output-provider.js";
 import { InputProvider, type SelectOptions } from "../input-provider.js";
 
 import type { ProgramResultNonError } from "../../logic/types.js";
+import { KvTräger } from "../../prompts/types.js";
 
 export class HtmlOutputProvider extends OutputProvider {
 	public override async result(result: ProgramResultNonError): Promise<void> {
@@ -13,6 +14,7 @@ export class HtmlOutputProvider extends OutputProvider {
 		display$.classList.add("fs-5");
 
 		display$.innerHTML = await md2html(`
+- KV-Nummer: ${this.ctx.kvType === KvTräger.HauptKv ? "Haupt-KV" : "**Sonderfahrdienst-KV**"}
 - Transportart: **${result.transportType.toString()}**
 - Einsatzart: ${result.transportType === Transportart.Verrechenbar ? `**${result.callType.toString()}**` : "*keine Angabe*"}
 - Tarif: ${result.transportType === Transportart.Verrechenbar ? `**${result.billing.tariff.toString()}**` : "*keine Angabe*"}

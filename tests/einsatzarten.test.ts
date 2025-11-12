@@ -6,6 +6,7 @@ import { Transportart } from "../source/core/logic/einsatzarten.js";
 test("Dienstfahrt = TA 2", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			dispositionsStichwort: t.Stichwort.RD_Absicherung_Dienstfahrt,
 		},
@@ -16,6 +17,7 @@ test("Dienstfahrt = TA 2", async () => {
 test("Werkstattfahrt = TA 3", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			dispositionsStichwort: t.Stichwort.RD_Sonstige_Werkstattfahrt,
 		},
@@ -26,6 +28,7 @@ test("Werkstattfahrt = TA 3", async () => {
 test("Gebietsabsicherung = TA 4", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			dispositionsStichwort: t.Stichwort.RD_Absicherung_Gebietsabsicherung,
 		},

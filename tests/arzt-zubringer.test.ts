@@ -8,6 +8,7 @@ test("Arzt-Zubringer mit KTW, RTW = EA 5", async () => {
 	for (const vehicle of [t.Fahrzeug.KTW, t.Fahrzeug.RTW])
 		await runTest(
 			{
+				kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
 				dispositionsStichwort: t.Stichwort.RD_1,
 				einsatzSzenario: t.EinsatzZweck.ArztZubringer,
@@ -20,6 +21,7 @@ test("Arzt-Zubringer mit KTW, RTW = EA 5", async () => {
 test("Arzt-Zubringer mit NEF = EA 6", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			dispositionsStichwort: t.Stichwort.RD_1,
 			welchesEingesetzteFahrzeug: t.Fahrzeug.NEF,
@@ -31,6 +33,7 @@ test("Arzt-Zubringer mit NEF = EA 6", async () => {
 test("Arzt-Zubringer mit VEF = EA 7", async () => {
 	await runTest(
 		{
+			kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 			vorhaltung: t.Vorhaltung.Regelvorhaltung,
 			dispositionsStichwort: t.Stichwort.RD_VEF,
 			welchesEingesetzteFahrzeug: t.Fahrzeug.VEF,
@@ -43,6 +46,7 @@ test("Arzt-Zubringer mit NAW, ITW = NAV", async () => {
 	for (const vehicle of [t.Fahrzeug.NAW, t.Fahrzeug.ITW])
 		await runTest(
 			{
+				kvTyp: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
 				vorhaltung: t.Vorhaltung.Regelvorhaltung,
 				dispositionsStichwort: t.Stichwort.RD_1,
 				einsatzSzenario: t.EinsatzZweck.ArztZubringer,

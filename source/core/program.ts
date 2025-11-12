@@ -20,6 +20,40 @@ export async function run(ctx: PromptContext): Promise<ProgramResult> {
 }
 
 async function startPrompting(ctx: PromptContext): Promise<ProgramResult> {
+	const kvTyp = await ctx.prompts.kvTyp();
+
+	switch (kvTyp) {
+		case t.KvTyp.ÖffentlicheRechtlicheVorhaltung:
+			// TODO: "Nein" Branch aus der Dokumentation wird hier nicht berücksichtigt! - Nachfragen, wie diese Sektion zu verstehen ist!
+			ctx.kvType = t.KvTräger.HauptKv;
+			break;
+		case t.KvTyp.TemporäreVohalteerhöhung:
+			if (await ctx.prompts.vorhalteErhöhungFinanzierungDurchKtr()) {
+				ctx.kvType = t.KvTräger.HauptKv;
+			} else {
+				ctx.kvType = t.KvTräger.SonderfahrdienstKv;
+			}
+
+			break;
+
+		case t.KvTyp.WasserrettungBergrettung:
+			return {
+				error:
+					"Berg-, Wasser-, und Einsätze des Luftrettungsdienst aktuell nicht implementiert!",
+			};
+
+		case t.KvTyp.BayKSG:
+			return {
+				transportType: Transportart.NichtVerrechenbar,
+			};
+
+		case t.KvTyp.Privat:
+			return {
+				error:
+					"**Keine Erfassung und Abrechnung über die ZAST!** Der jeweilige Durchführende rechnet gemäß seines Vertrages direkt mit den Kostenträgern ab!",
+			};
+	}
+
 	if ((await ctx.prompts.vorhaltung()) === t.Vorhaltung.Sondereinsatz) {
 		await ctx.messages.sondereinsätzeNichtVerpflegt();
 

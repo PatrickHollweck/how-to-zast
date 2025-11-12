@@ -1,10 +1,11 @@
 import { run } from "../../core/program.js";
+import { IOProvider } from "../../core/io/io-provider.js";
 import { PromptContext } from "../../core/context.js";
+
 import {
 	HtmlInputProivder,
 	HtmlOutputProvider,
 } from "../../core/io/impl/html-io.js";
-import { IOProvider } from "../../core/io/io-provider.js";
 
 async function main() {
 	const ctx = new PromptContext(

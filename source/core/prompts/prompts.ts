@@ -16,6 +16,8 @@ export class Prompts {
 		return this.ctx.io.in.select({
 			title:
 				"Fand dein Einsatz im Rahmen des Hauptaufgabengebietes nach BayRDG statt?",
+			description:
+				"Hauptaufgaben: Krankentransport, Notfallrettung, Notarztdienst",
 			choices: [
 				{
 					name: "**Regelvorhaltung**",
@@ -30,6 +32,40 @@ export class Prompts {
 				},
 			],
 		});
+	}
+
+	public kvTyp() {
+		return this.ctx.io.in.select({
+			title: "In welchem Rahmen fand der Einsatz statt?",
+			choices: [
+				{
+					name: "Öffentlich-Rechtliche Vorhaltung",
+					value: t.KvTyp.ÖffentlicheRechtlicheVorhaltung,
+				},
+				{
+					name: "Temporäre Vorhalteerhöhung",
+					value: t.KvTyp.TemporäreVohalteerhöhung,
+				},
+				{
+					name: "BayKSG (Katastrophenschutzgesetz)",
+					value: t.KvTyp.BayKSG,
+				},
+				{
+					name: "Bergrettung- / Wasserrettung- / Luftrettungsdienst",
+					value: t.KvTyp.WasserrettungBergrettung,
+				},
+				{
+					name: "Private Leistungserbringung außerhalb des öffentlich-rechtlichen Rettungsdienst, jedoch Disposition durch ILS",
+					value: t.KvTyp.Privat,
+				},
+			],
+		});
+	}
+
+	public vorhalteErhöhungFinanzierungDurchKtr() {
+		return this.ctx.io.in.selectBool(
+			"Wird die Vorhalteerhöhung durch die Kostenträger oder den Betreiber finanziert?",
+		);
 	}
 
 	public einsatzSzenario() {

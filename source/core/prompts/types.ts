@@ -1,3 +1,16 @@
+export enum KvTyp {
+	ÖffentlicheRechtlicheVorhaltung,
+	TemporäreVohalteerhöhung,
+	WasserrettungBergrettung,
+	BayKSG,
+	Privat,
+}
+
+export enum KvTräger {
+	HauptKv,
+	SonderfahrdienstKv,
+}
+
 export enum Vorhaltung {
 	Regelvorhaltung,
 	Sondereinsatz,

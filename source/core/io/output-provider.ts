@@ -1,3 +1,4 @@
+import type { PromptContext } from "../context.js";
 import type { ProgramResultNonError } from "../logic/types.js";
 
 export enum MessageType {
@@ -9,6 +10,12 @@ export enum MessageType {
 }
 
 export abstract class OutputProvider {
+	protected ctx!: PromptContext;
+
+	setContext(ctx: PromptContext) {
+		this.ctx = ctx;
+	}
+
 	public async info(...messages: string[]) {
 		await this.message(MessageType.Info, messages);
 	}

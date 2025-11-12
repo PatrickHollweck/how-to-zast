@@ -5,11 +5,14 @@ import { TestInputProvider } from "./io/impl/test-io.js";
 import { assertObjectHasKey, type PickAssignableKeys } from "./util/types.js";
 
 import type { IOProvider } from "./io/io-provider.js";
+import type { KvTräger } from "./prompts/types.js";
 
 export class PromptContext {
 	public io: IOProvider;
 	public prompts: Prompts;
 	public messages: Messages;
+
+	public kvType: KvTräger | null = null;
 
 	private cache: Map<string, unknown>;
 
@@ -18,6 +21,9 @@ export class PromptContext {
 		this.cache = new Map();
 		this.messages = new Messages(io);
 		this.prompts = this.memoize(new Prompts(this));
+
+		this.io.in.setContext(this);
+		this.io.out.setContext(this);
 	}
 
 	private memoize(prompts: Prompts) {

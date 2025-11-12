@@ -1,3 +1,5 @@
+import type { PromptContext } from "../context.js";
+
 export interface SelectOptions<T> {
 	title: string;
 	description?: string;
@@ -5,6 +7,12 @@ export interface SelectOptions<T> {
 }
 
 export abstract class InputProvider {
+	protected ctx!: PromptContext;
+
+	public setContext(ctx: PromptContext) {
+		this.ctx = ctx;
+	}
+
 	public abstract select<T>(options: SelectOptions<T>): Promise<T>;
 
 	public async selectBool(

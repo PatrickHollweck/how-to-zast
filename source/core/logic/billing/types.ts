@@ -10,7 +10,7 @@ export enum Kostenträger {
 	KTR = "KTR # Krankenkasse des Patienten",
 	SZ = "SZ # Selbstzahler bzw. Privatrechnung",
 	BG = "BG # zuständige Berufsgenossenschaft",
-	KHS = "KHS # abgebendes Krankenhaus",
+	KHS = "KHS # abgebende Behandlungseinrichtung",
 }
 
 export enum Tarif {

@@ -2,6 +2,9 @@ import * as t from "./types.js";
 
 import type { PromptContext } from "../context.js";
 
+const DEFINITION_ARBEITS_WEGE_UNFALL_ODER_BERUFSKRANKNHEIT =
+	"Ein Arbeits-, Schul- oder Wegeunfall sind Unfälle, die ein Arbeitnehmer oder Schüler während der Arbeitszeit oder auf den direkten Arbeitsweg erleidet! Eine Berufskrankheit ist eine Krankheit, die sich der Versicherte durch eine berufliche Tätigkeit zugezogen hat.";
+
 export class Prompts {
 	private ctx: PromptContext;
 
@@ -69,6 +72,7 @@ export class Prompts {
 				},
 				{
 					name: "Schul-, Wege-, Arbeitsunfall oder ursächlich einer anerkannten Berufskrankheit",
+					description: DEFINITION_ARBEITS_WEGE_UNFALL_ODER_BERUFSKRANKNHEIT,
 					value: t.NotfallTyp_Downgrade.ArbeitsOderWegeOderSchulUnfall,
 				},
 				{
@@ -132,19 +136,19 @@ export class Prompts {
 					description: "Massenanfall von Verletzten - egal welcher Größe",
 				},
 				{
-					name: "#RD#Sonstige#Gebietsabsicherung",
+					name: "#RD#Sonstige#**Gebietsabsicherung**",
 					value: t.Stichwort.RD_Absicherung_Gebietsabsicherung,
 					description:
 						"Sicherstellung der Einsatzfähigkeit in einem anderen Rettungsdienstbereich bzw. Einsatzgebiet einer anderen Rettungswache",
 				},
 				{
-					name: "#RD#Sonstige#Dienstfahrt",
+					name: "#RD#Sonstige#**Dienstfahrt**",
 					value: t.Stichwort.RD_Absicherung_Dienstfahrt,
 					description:
 						"Voraussetzungen:\n1. Durchführung nur auf Anordnung durch KGF oder RDL\n2. Leitstelle muss davon unterrichtet sein und muss innerhalb der Vorhaltezeit diese Fahrt genehmigen\noder: nötige Fahrten zur Personalumsetzung",
 				},
 				{
-					name: "#RD#Sonstige#Werkstattfahrt",
+					name: "#RD#Sonstige#**Werkstattfahrt**",
 					value: t.Stichwort.RD_Sonstige_Werkstattfahrt,
 					description:
 						"Direkter Zusammenhang mit Reparatur eines Rettungsdienstfahrzeugs muss vorliegen",
@@ -308,8 +312,19 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 
 	public verlegungInKrankenhausNiedrigerVersorungsstufe() {
 		return this.ctx.io.in.selectBool(
-			"Wurde in ein Krankenhaus mit gleicher oder niedrigerer Versorgungsstufe verlegt?",
-			"Beispiel: Bettenmangel im abgebenden Krankenhaus. Auch ja: Bei jedem *anderem* Grund, wenn das abgebende Krankenhaus den Transport zahlen muss!",
+			"Wurde in ein Krankenhaus mit gleicher oder niedrigerer Versorgungsstufe verlegt?<br/>*oder:* Handelt es sich um eine Verbringung (Konsilfahrt)?",
+			`
+Beispiel: Bettenmangel im abgebenden Krankenhaus. Auch ja: Bei jedem *anderem* Grund, wenn das abgebende Krankenhaus den Transport zahlen muss!
+
+<hr/>
+
+Definitionen:
+- **Versorgungsstufe** = Einteilung durch das STMGP <a href="https://www.stmgp.bayern.de/gesundheitsversorgung/krankenhaeuser/">hier</a> einsehbar.
+- **Verbringung** = Patienten werden während eines stationären Krankenhausaufenthaltes zu einer ärztlichen Leistung an
+einen anderen Ort transportiert und anschließend - zumeist am selben Tag (24 h) - wieder
+zurückgebracht. (zumeist: Konsilfahrt).
+- Verlegung = Transport eines Patienten von einem Krankenhaus in ein anderes zur weiteren stationären Aufnahme.
+`,
 		);
 	}
 
@@ -322,6 +337,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 	public istUrsacheBG() {
 		return this.ctx.io.in.selectBool(
 			"Ist ein Schul-, Arbeits-, Wegeunfall oder eine anerkannte Berufskrankheit ursächlich für den Einsatz?",
+			DEFINITION_ARBEITS_WEGE_UNFALL_ODER_BERUFSKRANKNHEIT,
 		);
 	}
 
@@ -338,8 +354,7 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 				{
 					name: "Arbeitsunfall / Wegeunfall",
 					value: t.NotfalleinsatzTyp.ArbeitsOderWegeUnfall,
-					description:
-						"Notfalleinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!",
+					description: `${DEFINITION_ARBEITS_WEGE_UNFALL_ODER_BERUFSKRANKNHEIT}. Notfalleinsatz am Arbeitsplatz/Schule oder auf dem Weg von/zum Arbeitsplatz/Schule.\nInternistische Notfälle fallen nicht unter diese EA!`,
 				},
 				{
 					name: "Schulunfall",
@@ -405,6 +420,143 @@ Auszug aus der <a href="https://www.g-ba.de/richtlinien/25/">Krankentransport Ri
 				{ name: "*Andere Region*", value: t.HoldienstTyp.Andere },
 			],
 		});
+	}
+
+	public krankentransportSzenario() {
+		return this.ctx.io.in.select({
+			title: "Was beschreibt den Einsatz am besten?",
+			description:
+				"**KHS** = Krankenhaus, **Behandlungseinrichtung** = KHS oder Ambulante Praxis oder sonstige ambulante Therapie",
+			choices: [
+				{
+					name: "Fahrt zu **stationärer** Aufnahme in KHS",
+					value: t.KrankentransportTyp.KtpZumKh,
+					description:
+						"1. Fahrt zur stationären Aufnahme; 2. Ausgangsort ist **KEIN** Krankenhaus",
+				},
+				{
+					name: "Fahrt zu oder von **ambulanter** Behandlung in einem **Krankenhaus**",
+					value: t.KrankentransportTyp.AmbulanzfahrtNichtGenehmigt_KHS,
+					description:
+						"**Einsatzort ist kein Krankenhaus, falls ja -> Verlegung!** z.B Katheterwechsel in KHS; Nur ambulante Behandlung, wenn diese nicht durch eine andere Einsatzart besser beschrieben wird!",
+				},
+				{
+					name: "Fahrt zu oder von **ambulanter** Behandlung in **Ambulanz**, außerhalb eines Krankenhaus!",
+					value: t.KrankentransportTyp.AmbulanzfahrtNichtGenehmigt_Ambulanz,
+					description:
+						"z.B Katheterwechsel in urologischer Praxis; Nur ambulante Behandlung, wenn diese nicht durch eine andere Einsatzart besser beschrieben wird!",
+				},
+				{
+					name: "Fahrt zu/von **ambulanten Operation, vor- /nach-/teilstationären Behandlung**",
+					value: t.KrankentransportTyp.AmbulanzfahrtGenehmigt,
+				},
+				{
+					name: "Fahrten zur **Strahlen- und Chemotherapie** und sonstige **genehmigte Serienfahrten**",
+					value: t.KrankentransportTyp.Serienfahrt,
+				},
+				{
+					name: "Fahrt von oder zu **Dialyse**",
+					value: t.KrankentransportTyp.Dialyse,
+				},
+				{
+					name: "Verlegung von KHS A zu **stationärem** Aufenthalt in KHS B",
+					value: t.KrankentransportTyp.Verlegung,
+					description:
+						"Verlegung aus stationärem Aufenthalt von KHS A nach KHS B",
+				},
+				{
+					name: "**Verbringung** von KHS A zu **ambulanter Versorgung** in KHS B",
+					value: t.KrankentransportTyp.AmbulanzfahrtKonsil,
+				},
+				{
+					name: "Verlegung von KHS A in **heimatnahes** KHS",
+					value: t.KrankentransportTyp.VerlegungInHeimkrankenhaus,
+				},
+				{
+					name: "Heimfahrt aus **stationärem** Aufenthalt",
+					value: t.KrankentransportTyp.Heimfahrt,
+					description: "Zielort ist **kein** KHS",
+				},
+				{
+					name: "Fahrt zu **Kurzzeitpflege** oder **Wohnungswechsel**",
+					value: t.KrankentransportTyp.HeimfahrtWohnungswechel,
+					description:
+						"Kurzzeitpflege, Patient wird zu Hause gepflegt und die Angehörigen wollen für einige Wochen Urlaub machen. Dann wird der Patient in eine Pflegeeinrichtung verbracht. Wohnortverlegung, Patient lebt im Altenheim und sein Gesundheitszustand verschlechtert sich so, dass er in ein Pflegeheim umziehen muss",
+				},
+				{
+					name: "Transport von **Blutkonserven** oder **medizinischem Gerät**",
+					value: t.KrankentransportTyp.TransportMedGerät,
+				},
+				{
+					name: "Transport von **Transplantaten** (primär: Organe)",
+					value: t.KrankentransportTyp.TransplantatTransport,
+				},
+				{
+					name: "Fahrt in Zusammenhang mit **Versorgungsleiden**",
+					value: t.KrankentransportTyp.Versorgungsleiden,
+				},
+				{
+					name: "Fahrt zwischen KHS Braunau und KHS Simbach (nur Fahrzeuge des KV211)",
+					value: t.KrankentransportTyp.AmbulanzfahrtBraunauSimbach,
+				},
+				{
+					name: "**Keine passende Beschreibung** - Sonstiger Krankentransport",
+					value: t.KrankentransportTyp.Sonstiger,
+				},
+			],
+		});
+	}
+
+	public liegtKrankentransportGenehmigungVor() {
+		return this.ctx.io.in.selectBool(
+			"Liegt eine Genehmigung der Krankenkasse für den Transport vor?",
+			"Eine **Genehmigungnummer** der Krankenkasse muss vorliegen! Der Patient muss bei seiner Krankenkasse anrufen und sich den Transport genehmigen lassen!",
+		);
+	}
+
+	public liegtGenehmigungsKulanzausnahmeVor() {
+		return this.ctx.io.in.select({
+			title: "Trifft eine der folgenden Aussagen zu? **Der Patient...**",
+			choices: [
+				{
+					name: `hat einen Schwerbehindertenausweis mit dem Merkzeichen „aG“, „Bl“ oder „H“`,
+					description: `Patienten welche "**a**ußergewöhnlich **G**ehbehindert", "**Bl**ind", oder "erheblich **H**ilfsbedürftig" sind. Nur wenn sie diese Eigenschaft durch Vorlage eines Schwerbehindertenausweis nachweisen können`,
+					value: t.KtpKulanzGrund.AlleAußerDakVersicherte,
+				},
+				{
+					name: "hat einen Pflegegrad 4 oder 5 oder bei Pflegegrad 3 zusätzlich eine (haus)ärztlich bestätigte dauerhafte Beeinträchtigung der Mobilität",
+					description: "gemäß: § 15 SGB XI",
+					value: t.KtpKulanzGrund.AlleAußerDakVersicherte,
+				},
+				{
+					name: `wird am "selben Tag", Feiertag, Wochenende, Feiertag oder während Nacht-, Abendstunden transportiert`,
+					description:
+						"In diesen Fällen hatte der Patient keine Möglichkeit eine Genehmigung durch die Krankenkasse zu beantragen, weshalb eine Kulanzregelung greift!",
+					value: t.KtpKulanzGrund.AlleKrankenkassen,
+				},
+				{
+					name: "**Keine Aussage trifft zu**",
+					value: t.KtpKulanzGrund.Keiner,
+				},
+			],
+		});
+	}
+
+	public istBeiDakVersichert() {
+		return this.ctx.io.in.selectBool(
+			`Ist der Patient bei der "DAK" versichert?`,
+		);
+	}
+
+	public ktpIstHinfahrtZuBehandlungseinrichtung() {
+		return this.ctx.io.in.selectBool(
+			"Handelt es sich um eine **Hinfahrt** in eine (ambulante) Behandlungseinrichtung",
+			"Ambulante Behandlung auch in ZNA eines Krankenhaus möglich. Zumeist jedoch Ambulanzen eines MVZ, KH oder niedergelassenem Arzt",
+		);
+	}
+
+	public ktpIstAmbulanteBehandlung() {
+		return this.ctx.io.in.selectBool("Wurde ");
 	}
 
 	public notfallSzenarioMitNA() {

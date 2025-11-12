@@ -75,6 +75,25 @@ export enum NotfallTyp_Downgrade {
 	Verlegung,
 }
 
+export enum KrankentransportTyp {
+	KtpZumKh,
+	Verlegung,
+	VerlegungInHeimkrankenhaus,
+	Heimfahrt,
+	HeimfahrtWohnungswechel,
+	AmbulanzfahrtKonsil,
+	AmbulanzfahrtGenehmigt,
+	AmbulanzfahrtNichtGenehmigt_KHS,
+	AmbulanzfahrtNichtGenehmigt_Ambulanz,
+	AmbulanzfahrtBraunauSimbach,
+	Dialyse,
+	Sonstiger,
+	TransportMedGerät,
+	TransplantatTransport,
+	Versorgungsleiden,
+	Serienfahrt,
+}
+
 export enum AblehungsgrundNotarzt {
 	KeinGrund,
 	Luftrettungsmittel,
@@ -83,6 +102,12 @@ export enum AblehungsgrundNotarzt {
 	NichtImDienst,
 	NichtAusBayern,
 	KeineLeistung,
+}
+
+export enum KtpKulanzGrund {
+	Keiner,
+	AlleAußerDakVersicherte,
+	AlleKrankenkassen,
 }
 
 export enum RthTransportTyp {

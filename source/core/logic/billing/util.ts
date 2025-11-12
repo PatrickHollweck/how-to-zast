@@ -75,19 +75,19 @@ export async function handle_KHS_KTR_BG_SZ(
 	billingContext: AbrechnungsContext,
 	disallowBG = false,
 ): Promise<BillingInfo> {
+	if (await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()) {
+		return {
+			tariff: getKrankenhausTarif(billingContext),
+			target: Kostenträger.KHS,
+		};
+	}
+
 	if (!disallowBG) {
 		const isBG = await handle_BG_SZ(ctx, billingContext);
 
 		if (isBG) {
 			return isBG;
 		}
-	}
-
-	if (await ctx.prompts.verlegungInKrankenhausNiedrigerVersorungsstufe()) {
-		return {
-			tariff: getKrankenhausTarif(billingContext),
-			target: Kostenträger.KHS,
-		};
 	}
 
 	return await handle_KTR_SZ(ctx, billingContext);

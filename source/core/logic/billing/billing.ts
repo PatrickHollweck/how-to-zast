@@ -3,7 +3,7 @@ import * as t from "../../prompts/types.js";
 import type { BillingInfo } from "../types.js";
 import type { PromptContext } from "../../context.js";
 
-import { AbrechnungsContext, Tarif } from "./types.js";
+import { AbrechnungsContext, Kostenträger, Tarif } from "./types.js";
 
 import {
 	handle_KTR_SZ,
@@ -100,8 +100,54 @@ async function handleNotfall(ctx: PromptContext): Promise<BillingInfo> {
 	}
 }
 
-async function handleKrankentransport(ctx: PromptContext) {
-	return await handle_KTR_SZ(ctx, AbrechnungsContext.KTP);
+async function handleKrankentransport(
+	ctx: PromptContext,
+): Promise<BillingInfo> {
+	switch (await ctx.prompts.krankentransportSzenario()) {
+		case t.KrankentransportTyp.KtpZumKh:
+			return await handle_BG_KTR_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.Verlegung:
+			return await handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.VerlegungInHeimkrankenhaus:
+			return await handle_BG_SZ_forced(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.Heimfahrt:
+			return await handle_BG_KTR_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.HeimfahrtWohnungswechel:
+			return {
+				tariff: Tarif.KTP_SZ,
+				target: Kostenträger.SZ,
+			};
+		case t.KrankentransportTyp.AmbulanzfahrtKonsil:
+			return {
+				tariff: Tarif.KTP_KHS,
+				target: Kostenträger.KHS,
+			};
+		case t.KrankentransportTyp.AmbulanzfahrtGenehmigt:
+		case t.KrankentransportTyp.AmbulanzfahrtBraunauSimbach:
+		case t.KrankentransportTyp.AmbulanzfahrtNichtGenehmigt_KHS:
+		case t.KrankentransportTyp.AmbulanzfahrtNichtGenehmigt_Ambulanz:
+		case t.KrankentransportTyp.Dialyse:
+			// TODO: Dialyse während KHS aufenthalt -> KTR KHS
+			return handle_KTR_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.Sonstiger:
+			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.TransportMedGerät:
+			// TODO: Nachricht schreiben, wie Kostenträger einzutragen ist
+			return {
+				tariff: Tarif.KTP_KHS,
+				target: Kostenträger.KHS,
+			};
+		case t.KrankentransportTyp.TransplantatTransport:
+			// TODO: Nachricht schreiben, wie Kostenträger einzutragen ist
+			return {
+				tariff: Tarif.KTP_KHS,
+				target: Kostenträger.KHS,
+			};
+		case t.KrankentransportTyp.Versorgungsleiden:
+			return handle_KTR_SZ(ctx, AbrechnungsContext.KTP);
+		case t.KrankentransportTyp.Serienfahrt:
+			return handle_BG_KTR_SZ(ctx, AbrechnungsContext.KTP);
+	}
 }
 
 async function handleKTPHerabstufung(ctx: PromptContext): Promise<BillingInfo> {

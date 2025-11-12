@@ -21,7 +21,7 @@ export enum Einsatzart {
 	KTP_Notfall = 17,
 	KTP_Ambulanzfahrt_KV211 = 18,
 	KTP_Sonstige = 19,
-	KTP_RÜckverlegung = 90,
+	KTP_Verlegung_HeimKHS = 90,
 	KTP_MedTransport = 91,
 	KTP_Transplantat = 93,
 	KTP_BG_Unfall = 94,

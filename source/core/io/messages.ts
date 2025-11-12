@@ -28,6 +28,9 @@ export class Messages {
 	public readonly ABRECHNUNG_MANV =
 		"Bei einem MANV ist die Abrechnungen mit der ZAST GmbH direkt zu klären!";
 
+	public readonly VERLEGUNG_HEIMATNAHES_KH_OHNE_GENEHMIGUNG =
+		"Eine Verlegung in ein Heimatnahes Krankenhaus ausschließlich mit vorliegender Verordnung und Genehmigung durch die Krankenkasse erfolgen! Eine Abrechnung ist nicht möglich.";
+
 	public async ktpNotfallHerabstufung() {
 		await this.io.out.warning(
 			`
@@ -148,6 +151,24 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 	public async keinKostenträgerFehlermeldung() {
 		await this.io.out.error(
 			"Dieser Einsatz kann nur durch die Berufsgenossenschaft oder als Selbstzahler abgerechnet werden. Beides ist aufgrund der Anfgaben nicht möglich. Bitte prüfe deine Antworten!",
+		);
+	}
+
+	public async ktpGenehmigungsnummerEintragen() {
+		await this.io.out.info(
+			"Die Genehmigungsnummer muss im Nidapad unter Abrechnungsdaten eingetragen werden!",
+		);
+	}
+
+	public async ktpKulanzAblehnungsgrundEintragen() {
+		await this.io.out.info(
+			`Eintrag in Nidapad ZAST-Info feld: "Kein Genehmigung da: Feiertag / selber Tag / Nachtstunden, Wochenende o.ä`,
+		);
+	}
+
+	public async ktpDakHinfahrtZuNichtKhsAmbulanterBehandlungHinweis() {
+		await this.io.out.info(
+			"Die Verordnung und Genehmigung innerhalb von 10 Tagen unter Angabe der Vorgangsnummer per EMail oder Fax an Ihre/n Sachbearbeiter/in der ZAST GmbH senden. Zusammensetzung der Vorgangsnummer: (KV-Nummer/RW-Nummer/Auftragsnummer/Monat/Jahr)",
 		);
 	}
 }

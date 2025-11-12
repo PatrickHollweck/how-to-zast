@@ -177,9 +177,18 @@ export async function handleKrankentransport(
 		ctx.setCached("verlegungInKrankenhausNiedrigerVersorungsstufe", true);
 	}
 
-	return {
+	const result = {
 		transportType: Transportart.Verrechenbar,
 		callType,
 		billing: await findBillingType(ctx, AbrechnungsContext.KTP),
 	};
+
+	if (
+		result.billing.target === Kostenträger.KTR ||
+		result.billing.target === Kostenträger.BG
+	) {
+		await ctx.messages.ktpDokumentationZwingendeMedBegründung();
+	}
+
+	return result;
 }

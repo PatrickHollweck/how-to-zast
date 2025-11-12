@@ -171,4 +171,14 @@ Abrechnung **ausschließlich** als KTP-Notfall, falls kein RTW zur Verfügung st
 			"Die Verordnung und Genehmigung innerhalb von 10 Tagen unter Angabe der Vorgangsnummer per EMail oder Fax an Ihre/n Sachbearbeiter/in der ZAST GmbH senden. Zusammensetzung der Vorgangsnummer: (KV-Nummer/RW-Nummer/Auftragsnummer/Monat/Jahr)",
 		);
 	}
+
+	public async ktpDokumentationZwingendeMedBegründung() {
+		await this.io.out.info(`
+**Eine "zwingende medizische Begründung" MUSS auf der Verordnung (Transportschein) dokumentiert sein!**
+<hr/>
+
+- Der einweisende Arzt liefert die zwingende medizinische Begründung im Sinne des § 60 SGB V als Voraussetzung für die Kostenübernahme durch den Sozialversicherungsträger.
+- Dies geschieht regelmäßig auf der Verordnung unter Verwendung des Diagnoseschlüssels ICD 10 oder Kennzeichnung in den hierfür vorgesehenen Feldern des Verordnungsvordrucks.
+`);
+	}
 }

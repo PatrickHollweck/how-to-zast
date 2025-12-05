@@ -155,20 +155,24 @@ async function handleKTPHerabstufung(ctx: PromptContext): Promise<BillingInfo> {
 		case t.NotfallTyp_Downgrade.ArbeitsOderWegeOderSchulUnfall:
 			ctx.setCached("istUrsacheBG", true);
 			return await handle_BG_KTR_SZ(ctx, AbrechnungsContext.KTP_Herabstufung);
+
 		case t.NotfallTyp_Downgrade.SonstigerEinsatz:
 			ctx.setCached("istUrsacheBG", false);
-			return await handle_BG_SZ_forced(
+			return await handle_BG_KTR_SZ(
 				ctx,
 				AbrechnungsContext.KTP_Herabstufung,
 			);
+
 		case t.NotfallTyp_Downgrade.Verlegung:
 			return handle_KHS_KTR_BG_SZ(ctx, AbrechnungsContext.KTP_Herabstufung);
+
 		case t.NotfallTyp_Downgrade.Holdienst:
 			return handle_KHS_KTR_BG_SZ(
 				ctx,
 				AbrechnungsContext.KTP_Herabstufung,
 				true,
 			);
+
 		case t.NotfallTyp_Downgrade.SonstigerUnfall:
 			return await handle_KTR_SZ(ctx, AbrechnungsContext.KTP_Herabstufung);
 	}
@@ -195,3 +199,4 @@ async function handleDoctorCall(ctx: PromptContext): Promise<BillingInfo> {
 			throw new Error("Unbekannter Notfalltyp");
 	}
 }
+
